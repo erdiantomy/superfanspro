@@ -6,6 +6,7 @@ import { idr } from "@/data/constants";
 import { Avatar, LiveDot, SportTag, SupportBar, SectionHead } from "./UIElements";
 import { container, item } from "./MotionVariants";
 import Odometer from "./Odometer";
+import logo from "@/assets/superfans-logo.png";
 
 interface HomeProps {
   onPick: (m: Match) => void;
@@ -44,10 +45,7 @@ export default function HomeScreen({ onPick }: HomeProps) {
       {/* Header */}
       <motion.div variants={item} className="flex justify-between items-center mb-6">
         <div>
-          <div className="font-display text-[30px] font-black tracking-tight leading-none">
-            <span className="text-green">FAN</span>PRIZE
-          </div>
-          <div className="text-label text-[11px] -mt-0.5">Public Support Platform</div>
+          <img src={logo} alt="SuperFans" className="h-8" />
         </div>
         <div className="flex items-center gap-2">
           <div className="bg-card border border-subtle rounded-[20px] px-3 py-1.5 text-[12px] text-green font-semibold flex items-center gap-1.5">

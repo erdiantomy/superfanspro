@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { lovable } from "@/integrations/lovable/index";
+import logo from "@/assets/superfans-logo.png";
 
 export default function AuthScreen() {
   const handleGoogleSignIn = async () => {
@@ -24,10 +25,8 @@ export default function AuthScreen() {
       >
         {/* Logo */}
         <div className="mb-8">
-          <div className="font-display text-[48px] font-black tracking-tight leading-none mb-1">
-            <span className="text-green">FAN</span>PRIZE
-          </div>
-          <div className="text-label text-[13px]">Public Support Platform</div>
+          <img src={logo} alt="SuperFans" className="h-16 mx-auto mb-2" />
+          <div className="text-label text-[13px]">Play. Win. Reward.</div>
         </div>
 
         {/* Tagline */}
