@@ -1,20 +1,22 @@
-import { motion, useSpring, useTransform, useMotionValue, animate } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+import { useEffect } from "react";
 import { idr } from "@/data/constants";
+
+const DIGIT_HEIGHT = 1; // in em
 
 function Digit({ value }: { value: number }) {
   const mv = useMotionValue(0);
-  const y = useTransform(mv, (v) => `${-v * 100}%`);
+  const y = useTransform(mv, (v) => `${-v * DIGIT_HEIGHT}em`);
 
   useEffect(() => {
     animate(mv, value, { type: "spring", stiffness: 200, damping: 20 });
   }, [value, mv]);
 
   return (
-    <span className="inline-block relative overflow-hidden" style={{ height: "1em", width: "0.62em" }}>
+    <span className="inline-block relative overflow-hidden" style={{ height: `${DIGIT_HEIGHT}em`, width: "0.62em" }}>
       <motion.span className="absolute left-0 top-0 flex flex-col" style={{ y }}>
         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((d) => (
-          <span key={d} className="block text-center" style={{ height: "1em", lineHeight: "1em" }}>
+          <span key={d} className="block text-center" style={{ height: `${DIGIT_HEIGHT}em`, lineHeight: `${DIGIT_HEIGHT}em` }}>
             {d}
           </span>
         ))}
@@ -27,7 +29,7 @@ export default function Odometer({ value, className = "" }: { value: number; cla
   const formatted = idr(value);
 
   return (
-    <span className={`inline-flex items-center ${className}`}>
+    <span className={`inline-flex items-baseline ${className}`} style={{ lineHeight: `${DIGIT_HEIGHT}em` }}>
       {formatted.split("").map((char, i) => {
         const digit = parseInt(char, 10);
         if (!isNaN(digit)) {
