@@ -192,4 +192,6 @@ export default function HomeScreen({ onPick }: HomeProps) {
           ))}
         </>
       )}
+    </motion.div>
+  );
 }
