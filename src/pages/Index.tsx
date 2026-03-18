@@ -24,6 +24,14 @@ const Index = () => {
   };
 
   const renderScreen = () => {
+    if (screen === "matchResult" && match) {
+      return (
+        <MatchResultScreen
+          m={match}
+          onBack={() => { setScreen("home"); setNav("home"); }}
+        />
+      );
+    }
     if (screen === "matchDetail" && match) {
       return (
         <MatchDetail
