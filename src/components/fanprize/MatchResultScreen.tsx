@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
-import { type Match } from "@/data/constants";
+import { type Match } from "@/hooks/useData";
 import { idr } from "@/data/constants";
-import { Avatar, SportTag, SupportBar, SectionHead } from "./UIElements";
+import { Avatar, SupportBar, SectionHead } from "./UIElements";
 import { container, item } from "./MotionVariants";
 
 interface Props {
@@ -44,7 +44,6 @@ function Confetti() {
 
 export default function MatchResultScreen({ m, onBack }: Props) {
   const winner = m.winner!;
-  const loser = winner.id === m.pA.id ? m.pB : m.pA;
   const winnerPayout = Math.floor(m.pool * 0.9);
   const platformFee = Math.floor(m.pool * 0.1);
 

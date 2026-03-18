@@ -1,11 +1,31 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
+import { useWalletTransactions, useProfile } from "@/hooks/useData";
 import { TRANSACTIONS, txIcon } from "@/data/constants";
 import { SectionHead } from "./UIElements";
 import { container, item } from "./MotionVariants";
 
 export default function WalletScreen() {
+  const { user } = useAuth();
+  const { data: profile } = useProfile(user?.id);
+  const { data: dbTxs = [] } = useWalletTransactions(user?.id);
   const [tab, setTab] = useState<"txs" | "rewards">("txs");
+
+  const idrBalance = "Rp 125.000";
+  const spBalance = profile?.points?.toLocaleString() || "0";
+
+  // Use DB transactions if available, fall back to static data
+  const txList = dbTxs.length > 0
+    ? dbTxs.map(tx => ({
+        id: tx.id,
+        type: tx.type,
+        desc: tx.description,
+        idr: tx.idr_amount ? `Rp ${tx.idr_amount.toLocaleString("id-ID")}` : "Rp 0",
+        sp: tx.sp_amount ? `${tx.sp_amount > 0 ? "+" : ""}${tx.sp_amount} SP` : "",
+        time: new Date(tx.created_at).toLocaleDateString(),
+      }))
+    : TRANSACTIONS;
 
   return (
     <motion.div
@@ -21,12 +41,12 @@ export default function WalletScreen() {
       <motion.div variants={item} className="grid grid-cols-2 gap-2.5 mb-[18px]">
         <div className="gradient-card border border-subtle rounded-2xl p-4">
           <div className="text-label text-[10px] mb-1">IDR BALANCE</div>
-          <div className="font-display text-[22px] font-black">Rp 125.000</div>
+          <div className="font-display text-[22px] font-black">{idrBalance}</div>
           <button className="mt-2 w-full bg-green/10 border border-green/40 rounded-lg py-1.5 text-[11px] text-green font-semibold cursor-pointer">Top Up</button>
         </div>
         <div className="gradient-card border border-subtle rounded-2xl p-4">
           <div className="text-label text-[10px] mb-1">SUPPORT POINTS</div>
-          <div className="font-display text-[22px] font-black text-green">5,680 SP</div>
+          <div className="font-display text-[22px] font-black text-green">{spBalance} SP</div>
           <button className="mt-2 w-full bg-secondary/10 border border-secondary/40 rounded-lg py-1.5 text-[11px] text-secondary font-semibold cursor-pointer">Redeem</button>
         </div>
       </motion.div>
@@ -49,7 +69,7 @@ export default function WalletScreen() {
         ))}
       </motion.div>
 
-      {tab === "txs" && TRANSACTIONS.map(tx => (
+      {tab === "txs" && txList.map(tx => (
         <motion.div key={tx.id} variants={item} className="bg-card border border-subtle rounded-lg px-3.5 py-3 mb-1.5 flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-[16px]">
             {txIcon[tx.type] || "↑"}

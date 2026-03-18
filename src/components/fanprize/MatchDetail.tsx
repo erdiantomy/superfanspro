@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { type Match, type Player, idr } from "@/data/constants";
+import { type Match, type Player } from "@/hooks/useData";
+import { idr } from "@/data/constants";
 import { Avatar, LiveDot, SportTag, SupportBar, SectionHead } from "./UIElements";
 import { container, item } from "./MotionVariants";
 import Odometer from "./Odometer";

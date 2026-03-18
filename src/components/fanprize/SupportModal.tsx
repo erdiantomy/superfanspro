@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { type Match, type Player, idr } from "@/data/constants";
+import { type Match, type Player } from "@/hooks/useData";
+import { idr } from "@/data/constants";
 import { Avatar } from "./UIElements";
 
 interface Props {

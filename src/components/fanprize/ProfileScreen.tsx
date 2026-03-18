@@ -1,11 +1,21 @@
 import { motion } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useData";
 import { Avatar, SectionHead } from "./UIElements";
 import { container, item } from "./MotionVariants";
 
 export default function ProfileScreen() {
+  const { user, signOut } = useAuth();
+  const { data: profile } = useProfile(user?.id);
+
+  const displayName = profile?.display_name || profile?.username || user?.email || "User";
+  const email = user?.email || "";
+  const points = profile?.points || 0;
+  const avatarInitials = displayName.slice(0, 2).toUpperCase();
+
   const stats = [
     ["🤝", "18", "Total Supports"],
-    ["🪙", "5,680", "Points Earned"],
+    ["🪙", points.toLocaleString(), "Points Earned"],
     ["👁", "34", "Matches Watched"],
     ["🎯", "72%", "Win Rate"],
   ];
@@ -26,13 +36,17 @@ export default function ProfileScreen() {
       {/* Profile Header */}
       <motion.div variants={item} className="text-center mb-6">
         <div className="inline-block relative mb-3">
-          <Avatar s="TR" size={72} />
+          {profile?.avatar_url ? (
+            <img src={profile.avatar_url} alt="Avatar" className="w-[72px] h-[72px] rounded-full object-cover border-2 border-green" />
+          ) : (
+            <Avatar s={avatarInitials} size={72} />
+          )}
           <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-green border-2 border-background flex items-center justify-center text-[10px]">✓</div>
         </div>
-        <div className="font-display text-[26px] font-black">TomRYU</div>
-        <div className="text-label text-[12px]">tom@tompadel.com</div>
+        <div className="font-display text-[26px] font-black">{displayName}</div>
+        <div className="text-label text-[12px]">{email}</div>
         <div className="inline-flex items-center gap-1.5 mt-2 bg-green/10 border border-green/40 rounded-full px-3 py-1">
-          <span className="text-green text-[10px] font-semibold">RANK #4 · TOP SUPPORTER</span>
+          <span className="text-green text-[10px] font-semibold">RANK #{profile?.rank || "–"} · SUPPORTER</span>
         </div>
       </motion.div>
 
@@ -61,12 +75,20 @@ export default function ProfileScreen() {
       </motion.div>
 
       {/* Menu */}
-      {["Edit Profile", "Referral Code", "Notifications", "Help Center", "Sign Out"].map(menuItem => (
+      {["Edit Profile", "Referral Code", "Notifications", "Help Center"].map(menuItem => (
         <motion.div key={menuItem} variants={item} className="flex items-center justify-between py-3.5 border-b border-border cursor-pointer">
           <span className="text-[14px] font-medium">{menuItem}</span>
           <span className="text-muted-foreground">›</span>
         </motion.div>
       ))}
+      <motion.div
+        variants={item}
+        className="flex items-center justify-between py-3.5 border-b border-border cursor-pointer"
+        onClick={signOut}
+      >
+        <span className="text-[14px] font-medium text-destructive">Sign Out</span>
+        <span className="text-muted-foreground">›</span>
+      </motion.div>
     </motion.div>
   );
 }

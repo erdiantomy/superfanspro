@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { type Match, idr, MATCHES, LEADERBOARD } from "@/data/constants";
+import { useAuth } from "@/hooks/useAuth";
+import { useMatches, useLeaderboard, type Match } from "@/hooks/useData";
+import { idr } from "@/data/constants";
 import { Avatar, LiveDot, SportTag, SupportBar, SectionHead } from "./UIElements";
 import { container, item } from "./MotionVariants";
 import Odometer from "./Odometer";
@@ -10,6 +12,8 @@ interface HomeProps {
 }
 
 export default function HomeScreen({ onPick }: HomeProps) {
+  const { data: matches = [], isLoading } = useMatches();
+  const { data: leaderboard = [] } = useLeaderboard();
   const [pool, setPool] = useState(2450000);
 
   useEffect(() => {
@@ -17,9 +21,17 @@ export default function HomeScreen({ onPick }: HomeProps) {
     return () => clearInterval(iv);
   }, []);
 
-  const live = MATCHES.filter(m => m.status === "live");
-  const up = MATCHES.filter(m => m.status === "upcoming");
-  const finished = MATCHES.filter(m => m.status === "finished");
+  const live = matches.filter(m => m.status === "live");
+  const up = matches.filter(m => m.status === "upcoming");
+  const finished = matches.filter(m => m.status === "finished");
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-label text-[14px]">Loading matches...</div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -107,9 +119,11 @@ export default function HomeScreen({ onPick }: HomeProps) {
       ))}
 
       {/* Upcoming */}
-      <motion.div variants={item}>
-        <SectionHead title="UPCOMING" />
-      </motion.div>
+      {up.length > 0 && (
+        <motion.div variants={item}>
+          <SectionHead title="UPCOMING" />
+        </motion.div>
+      )}
       {up.map(m => (
         <motion.div
           key={m.id}
@@ -136,15 +150,16 @@ export default function HomeScreen({ onPick }: HomeProps) {
       ))}
 
       {/* Leaderboard */}
-      <motion.div variants={item} className="mt-5">
-        <SectionHead title="TOP SUPPORTERS" />
-      </motion.div>
-      {LEADERBOARD.slice(0, 3).map(u => (
+      {leaderboard.length > 0 && (
+        <motion.div variants={item} className="mt-5">
+          <SectionHead title="TOP SUPPORTERS" />
+        </motion.div>
+      )}
+      {leaderboard.slice(0, 3).map(u => (
         <motion.div key={u.rank} variants={item} className="bg-card border border-subtle rounded-lg px-3.5 py-3 mb-1.5 flex items-center gap-3">
           <span className="text-[22px] w-8 text-center">{u.badge}</span>
           <div className="flex-1">
             <div className="font-semibold text-[14px]">{u.user}</div>
-            <div className="text-label text-[10px]">{u.sup} supports</div>
           </div>
           <div className="font-display text-[16px] font-bold text-green">{u.pts.toLocaleString()} SP</div>
         </motion.div>
@@ -175,14 +190,10 @@ export default function HomeScreen({ onPick }: HomeProps) {
                     <>
                       <span className="text-green">{m.winner.name.split(" ")[0]}</span>
                       <span className="text-muted-foreground"> wins </span>
-                      <span className="text-muted-foreground text-[14px]">
-                        {m.sA}:{m.sB}
-                      </span>
+                      <span className="text-muted-foreground text-[14px]">{m.sA}:{m.sB}</span>
                     </>
                   ) : (
-                    <>
-                      {m.pA.name.split(" ")[0]} <span className="text-muted-foreground">vs</span> {m.pB.name.split(" ")[0]}
-                    </>
+                    <>{m.pA.name.split(" ")[0]} <span className="text-muted-foreground">vs</span> {m.pB.name.split(" ")[0]}</>
                   )}
                 </div>
               </div>
