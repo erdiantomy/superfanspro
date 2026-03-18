@@ -19,6 +19,7 @@ export default function HomeScreen({ onPick }: HomeProps) {
 
   const live = MATCHES.filter(m => m.status === "live");
   const up = MATCHES.filter(m => m.status === "upcoming");
+  const finished = MATCHES.filter(m => m.status === "finished");
 
   return (
     <motion.div
@@ -146,6 +147,51 @@ export default function HomeScreen({ onPick }: HomeProps) {
           <div className="font-display text-[16px] font-bold text-green">{u.pts.toLocaleString()} SP</div>
         </motion.div>
       ))}
+
+      {/* Recent Results */}
+      {finished.length > 0 && (
+        <>
+          <motion.div variants={item} className="mt-5">
+            <SectionHead title="RECENT RESULTS" />
+          </motion.div>
+          {finished.map(m => (
+            <motion.div
+              key={m.id}
+              variants={item}
+              onClick={() => onPick(m)}
+              className="bg-card border border-subtle rounded-lg p-3.5 mb-2 flex items-center gap-3 cursor-pointer hover:bg-accent transition-colors"
+            >
+              <div className="text-[24px]">🏆</div>
+              <div className="flex-1">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <SportTag sport={m.pA.sport} />
+                  <span className="text-label text-[10px]">{m.title}</span>
+                </div>
+                <div className="font-display text-[16px] font-bold">
+                  {m.winner ? (
+                    <>
+                      <span className="text-green">{m.winner.name.split(" ")[0]}</span>
+                      <span className="text-muted-foreground"> wins </span>
+                      <span className="text-muted-foreground text-[14px]">
+                        {m.sA}:{m.sB}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      {m.pA.name.split(" ")[0]} <span className="text-muted-foreground">vs</span> {m.pB.name.split(" ")[0]}
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="font-display text-[15px] font-bold text-green">{idr(m.pool)}</div>
+                <div className="text-label text-[10px]">{m.fans} supporters</div>
+              </div>
+              <span className="text-muted-foreground text-lg">›</span>
+            </motion.div>
+          ))}
+        </>
+      )}
     </motion.div>
   );
 }
