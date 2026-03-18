@@ -119,8 +119,8 @@ export default function SupportModal({ m, p, onClose, onConfirm }: Props) {
 
             <div className="flex gap-2.5">
               <motion.button whileTap={{ scale: 0.95 }} onClick={onClose} className="flex-1 bg-muted rounded-xl py-3.5 font-display text-[15px] font-bold text-foreground cursor-pointer">Cancel</motion.button>
-              <motion.button whileTap={{ scale: 0.95 }} onClick={confirm} className="flex-[2] rounded-xl py-3.5 font-display text-[15px] font-bold cursor-pointer text-background" style={{ background: `linear-gradient(135deg, ${c}, ${c}dd)` }}>
-                CONFIRM {idr(amt)}
+              <motion.button whileTap={{ scale: 0.95 }} onClick={confirm} disabled={submitting || amt <= 0} className="flex-[2] rounded-xl py-3.5 font-display text-[15px] font-bold cursor-pointer text-background disabled:opacity-50" style={{ background: `linear-gradient(135deg, ${c}, ${c}dd)` }}>
+                {submitting ? "SENDING…" : `CONFIRM ${idr(amt)}`}
               </motion.button>
             </div>
           </>
