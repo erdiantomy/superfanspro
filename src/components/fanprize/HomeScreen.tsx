@@ -100,9 +100,9 @@ export default function HomeScreen({ onPick }: HomeProps) {
 
           <SupportBar a={m.supA} b={m.supB} />
 
-          <button className="w-full mt-3 gradient-green rounded-xl py-3 font-display text-[16px] font-extrabold text-background tracking-wider uppercase">
+          <motion.button whileTap={{ scale: 0.95 }} className="w-full mt-3 gradient-green rounded-xl py-3 font-display text-[16px] font-extrabold text-background tracking-wider uppercase">
             SUPPORT NOW — EARN POINTS
-          </button>
+          </motion.button>
         </motion.div>
       ))}
 
