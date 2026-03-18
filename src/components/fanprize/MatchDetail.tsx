@@ -91,12 +91,12 @@ export default function MatchDetail({ m, onBack, onSupport }: Props) {
             </div>
 
             <div className="text-center px-3">
-              {m.status !== "upcoming" ? (
+              {status !== "upcoming" ? (
                 <>
                   <div className="font-display text-[44px] font-black leading-none tracking-tight">
-                    <span className="text-green">{m.sA}</span>
+                    <span className="text-green">{scoreA}</span>
                     <span className="text-muted-foreground text-[30px] mx-1">:</span>
-                    <span className="text-blue">{m.sB}</span>
+                    <span className="text-blue">{scoreB}</span>
                   </div>
                   <div className="text-label text-[9px] mt-0.5">SET SCORE</div>
                 </>
