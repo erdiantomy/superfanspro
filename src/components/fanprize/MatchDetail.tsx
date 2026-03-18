@@ -64,8 +64,8 @@ export default function MatchDetail({ m, onBack, onSupport }: Props) {
           <div className="text-label text-[10px]">{m.title}</div>
           <div className="font-display text-[16px] font-bold">Match Detail</div>
         </div>
-        {m.status === "live" && <LiveDot />}
-        {m.status === "upcoming" && (
+        {status === "live" && <LiveDot />}
+        {status === "upcoming" && (
           <span className="bg-secondary/20 border border-secondary/40 rounded-full px-2.5 py-1 text-[10px] text-secondary font-bold">UPCOMING</span>
         )}
         {m.status === "finished" && (
