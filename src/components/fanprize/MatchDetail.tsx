@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { type Match, type Player, idr } from "@/data/constants";
 import { Avatar, LiveDot, SportTag, SupportBar, SectionHead } from "./UIElements";
+import { container, item } from "./MotionVariants";
+import Odometer from "./Odometer";
 
 interface Props {
   m: Match;
@@ -42,9 +45,14 @@ export default function MatchDetail({ m, onBack, onSupport }: Props) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-4 pb-24 no-scrollbar">
+      <motion.div
+        className="flex-1 overflow-y-auto px-4 pb-24 no-scrollbar"
+        variants={container}
+        initial="hidden"
+        animate="show"
+      >
         {/* Players Card */}
-        <div className="gradient-card border border-subtle rounded-[20px] p-[18px] mb-3.5">
+        <motion.div variants={item} className="gradient-card border border-subtle rounded-[20px] p-[18px] mb-3.5">
           <div className="flex items-center justify-between mb-3.5">
             <div className="flex-1 text-center">
               <Avatar s={m.pA.av} size={58} />
@@ -77,15 +85,17 @@ export default function MatchDetail({ m, onBack, onSupport }: Props) {
           </div>
 
           <SupportBar a={m.supA} b={m.supB} />
-        </div>
+        </motion.div>
 
         {/* Pool Info */}
-        <div className="bg-accent rounded-lg p-4 mb-3.5">
+        <motion.div variants={item} className="bg-accent rounded-lg p-4 mb-3.5">
           <div className="flex justify-between items-center mb-1">
             <span className="text-label text-[10px] uppercase tracking-wider">Total Prize Pool</span>
             <span className="text-label text-[10px]">Funded by {fans} supporters</span>
           </div>
-          <div className="font-display text-[32px] font-black text-green leading-tight mb-2">{idr(pool)}</div>
+          <div className="font-display text-[32px] font-black text-green leading-tight mb-2">
+            <Odometer value={pool} />
+          </div>
           <div className="flex justify-between text-[11px]">
             <div>
               <span className="text-label">Winner Gets</span>
@@ -96,21 +106,23 @@ export default function MatchDetail({ m, onBack, onSupport }: Props) {
               <span className="text-foreground font-semibold ml-2">{idr(Math.floor(pool * 0.1))}</span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Recent Supporters */}
-        <SectionHead title="RECENT SUPPORTERS" />
-        <div className="flex items-center gap-1.5 mb-1">
-          {recent.map(([s, c]) => (
-            <Avatar key={s} s={s} size={30} color={c} />
-          ))}
-          <span className="text-label text-[10px] ml-1">+{fans - 5} more</span>
-        </div>
-        <div className="text-label text-[11px] mb-4">Andi K. just supported {m.pA.name.split(" ")[0]} · 2m ago</div>
+        <motion.div variants={item}>
+          <SectionHead title="RECENT SUPPORTERS" />
+          <div className="flex items-center gap-1.5 mb-1">
+            {recent.map(([s, c]) => (
+              <Avatar key={s} s={s} size={30} color={c} />
+            ))}
+            <span className="text-label text-[10px] ml-1">+{fans - 5} more</span>
+          </div>
+          <div className="text-label text-[11px] mb-4">Andi K. just supported {m.pA.name.split(" ")[0]} · 2m ago</div>
+        </motion.div>
 
         {/* Support Buttons */}
         {m.status !== "finished" && (
-          <>
+          <motion.div variants={item}>
             <SectionHead title="SUPPORT A PLAYER" />
             <div className="grid grid-cols-2 gap-2.5 mb-4">
               {[m.pA, m.pB].map((p, i) => {
@@ -130,27 +142,29 @@ export default function MatchDetail({ m, onBack, onSupport }: Props) {
                 );
               })}
             </div>
-          </>
+          </motion.div>
         )}
 
         {m.status === "finished" && m.winner && (
-          <div className="bg-accent rounded-lg p-4 text-center mb-4">
+          <motion.div variants={item} className="bg-accent rounded-lg p-4 text-center mb-4">
             <div className="text-[28px] mb-1">🏆</div>
             <div className="font-display text-[20px] font-black text-green">{m.winner.name} WINS!</div>
             <div className="text-label text-[12px]">Prize of {idr(Math.floor(m.pool * 0.9))} awarded</div>
-          </div>
+          </motion.div>
         )}
 
         {/* Share */}
-        <SectionHead title="SHARE MATCH" />
-        <div className="flex gap-2">
-          {[["💬", "WhatsApp", "#25D366"], ["📸", "Instagram", "#E1306C"], ["🔗", "Copy Link", "#5A6374"]].map(([ic, lb, c]) => (
-            <button key={lb} className="flex-1 rounded-lg py-2.5 px-3 text-[11px] font-semibold text-foreground cursor-pointer" style={{ backgroundColor: `${c}18`, border: `1px solid ${c}40` }}>
-              {ic} {lb}
-            </button>
-          ))}
-        </div>
-      </div>
+        <motion.div variants={item}>
+          <SectionHead title="SHARE MATCH" />
+          <div className="flex gap-2">
+            {[["💬", "WhatsApp", "#25D366"], ["📸", "Instagram", "#E1306C"], ["🔗", "Copy Link", "#5A6374"]].map(([ic, lb, c]) => (
+              <button key={lb} className="flex-1 rounded-lg py-2.5 px-3 text-[11px] font-semibold text-foreground cursor-pointer" style={{ backgroundColor: `${c}18`, border: `1px solid ${c}40` }}>
+                {ic} {lb}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

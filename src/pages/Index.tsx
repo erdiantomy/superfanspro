@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { type Match, type Player } from "@/data/constants";
+import { AnimatePresence, motion } from "framer-motion";
+import { screenTransition } from "@/components/fanprize/MotionVariants";
 import HomeScreen from "@/components/fanprize/HomeScreen";
 import MatchDetail from "@/components/fanprize/MatchDetail";
 import MatchResultScreen from "@/components/fanprize/MatchResultScreen";
@@ -27,6 +29,7 @@ const Index = () => {
     if (screen === "matchResult" && match) {
       return (
         <MatchResultScreen
+          key="matchResult"
           m={match}
           onBack={() => { setScreen("home"); setNav("home"); }}
         />
@@ -35,17 +38,19 @@ const Index = () => {
     if (screen === "matchDetail" && match) {
       return (
         <MatchDetail
+          key="matchDetail"
           m={match}
           onBack={() => { setScreen("home"); setNav("home"); }}
           onSupport={(m, p) => setModal({ m, p })}
         />
       );
     }
-    if (screen === "wallet") return <WalletScreen />;
-    if (screen === "store") return <StoreScreen />;
-    if (screen === "profile") return <ProfileScreen />;
+    if (screen === "wallet") return <WalletScreen key="wallet" />;
+    if (screen === "store") return <StoreScreen key="store" />;
+    if (screen === "profile") return <ProfileScreen key="profile" />;
     return (
       <HomeScreen
+        key="home"
         onPick={m => { setMatch(m); setScreen(m.status === "finished" ? "matchResult" : "matchDetail"); }}
       />
     );
@@ -53,7 +58,15 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground max-w-md mx-auto relative overflow-hidden" style={{ height: "100dvh" }}>
-      {renderScreen()}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={screen}
+          className="h-full"
+          {...screenTransition}
+        >
+          {renderScreen()}
+        </motion.div>
+      </AnimatePresence>
       <BottomNav active={nav} onNav={goNav} />
       {modal && (
         <SupportModal
