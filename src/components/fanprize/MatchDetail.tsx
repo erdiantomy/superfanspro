@@ -68,7 +68,7 @@ export default function MatchDetail({ m, onBack, onSupport }: Props) {
         {status === "upcoming" && (
           <span className="bg-secondary/20 border border-secondary/40 rounded-full px-2.5 py-1 text-[10px] text-secondary font-bold">UPCOMING</span>
         )}
-        {m.status === "finished" && (
+        {status === "finished" && (
           <span className="bg-destructive/20 border border-destructive/40 rounded-full px-2.5 py-1 text-[10px] text-destructive font-bold">FINISHED</span>
         )}
       </div>
