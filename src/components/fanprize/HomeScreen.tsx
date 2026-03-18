@@ -6,6 +6,7 @@ import { idr } from "@/data/constants";
 import { Avatar, LiveDot, SportTag, SupportBar, SectionHead } from "./UIElements";
 import { container, item } from "./MotionVariants";
 import Odometer from "./Odometer";
+import logo from "@/assets/superfans-logo.png";
 
 interface HomeProps {
   onPick: (m: Match) => void;
