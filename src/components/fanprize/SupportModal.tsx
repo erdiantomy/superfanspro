@@ -3,6 +3,10 @@ import { motion } from "framer-motion";
 import { type Match, type Player } from "@/hooks/useData";
 import { idr } from "@/data/constants";
 import { Avatar } from "./UIElements";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface Props {
   m: Match;
@@ -12,15 +16,48 @@ interface Props {
 }
 
 export default function SupportModal({ m, p, onClose, onConfirm }: Props) {
+  const { user } = useAuth();
+  const qc = useQueryClient();
   const [amt, setAmt] = useState(25000);
   const [custom, setCustom] = useState("");
   const [done, setDone] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const c = p.id === m.pA.id ? "hsl(var(--green))" : "hsl(var(--blue))";
   const AMTS = [10000, 25000, 50000, 100000];
+  const side = p.id === m.pA.id ? "a" : "b";
+  const pointsEarned = Math.max(10, Math.floor(amt / 1000));
 
-  const confirm = () => {
-    setDone(true);
-    setTimeout(() => onConfirm(amt), 2200);
+  const confirm = async () => {
+    if (!user || submitting || amt <= 0) return;
+    setSubmitting(true);
+    try {
+      const { error: supErr } = await supabase.from("supports").insert({
+        user_id: user.id,
+        match_id: m.id,
+        player: side,
+        amount: amt,
+        points_earned: pointsEarned,
+      });
+      if (supErr) throw supErr;
+
+      const { error: txErr } = await supabase.from("wallet_transactions").insert({
+        user_id: user.id,
+        type: "support" as const,
+        description: `Supported ${p.name} – ${m.title}`,
+        idr_amount: amt,
+        sp_amount: pointsEarned,
+      });
+      if (txErr) throw txErr;
+
+      qc.invalidateQueries({ queryKey: ["matches"] });
+      qc.invalidateQueries({ queryKey: ["wallet_transactions"] });
+      qc.invalidateQueries({ queryKey: ["profile"] });
+      setDone(true);
+      setTimeout(() => onConfirm(amt), 2200);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to submit support");
+      setSubmitting(false);
+    }
   };
 
   return (
