@@ -29,16 +29,40 @@ export default function BottomNav({ active, onNav }: Props) {
             <motion.button
               key={t.id}
               onClick={() => onNav(t.id)}
-              className="flex-1 flex flex-col items-center py-2.5 cursor-pointer transition-colors"
-              whileTap={{ scale: 0.85 }}
-              animate={isActive ? { scale: [1, 1.25, 1], transition: { duration: 0.35, ease: "easeOut" } } : { scale: 1 }}
+              className="flex-1 flex flex-col items-center py-2.5 cursor-pointer relative"
+              whileTap={{ scale: 0.75 }}
+              transition={{ type: "spring", stiffness: 500, damping: 15 }}
             >
-              <span className={`text-[20px] ${isActive ? "" : "opacity-50"}`}>{t.icon}</span>
-              <span
+              <motion.span
+                className={`text-[20px] ${isActive ? "" : "opacity-50"}`}
+                animate={isActive
+                  ? { scale: [0.6, 1.35, 0.9, 1.1, 1], y: [0, -6, 0, -2, 0] }
+                  : { scale: 1, y: 0 }
+                }
+                transition={isActive
+                  ? { duration: 0.45, ease: "easeOut" }
+                  : { duration: 0.2 }
+                }
+              >
+                {t.icon}
+              </motion.span>
+              <motion.span
                 className={`text-[9px] font-semibold mt-0.5 uppercase tracking-wider ${isActive ? "text-green" : "text-label"}`}
+                animate={isActive
+                  ? { opacity: [0, 1], y: [4, 0] }
+                  : { opacity: 1, y: 0 }
+                }
+                transition={{ duration: 0.25, delay: isActive ? 0.15 : 0 }}
               >
                 {t.label}
-              </span>
+              </motion.span>
+              {isActive && (
+                <motion.div
+                  layoutId="nav-indicator"
+                  className="absolute -top-px left-1/4 right-1/4 h-[2px] bg-green rounded-full"
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                />
+              )}
             </motion.button>
           );
         })}
