@@ -10,10 +10,11 @@ import MatchResultScreen from "@/components/fanprize/MatchResultScreen";
 import WalletScreen from "@/components/fanprize/WalletScreen";
 import StoreScreen from "@/components/fanprize/StoreScreen";
 import ProfileScreen from "@/components/fanprize/ProfileScreen";
+import AdminPanel from "@/pages/AdminPanel";
 import BottomNav from "@/components/fanprize/BottomNav";
 import SupportModal from "@/components/fanprize/SupportModal";
 
-type Screen = "home" | "matchDetail" | "matchResult" | "wallet" | "store" | "profile";
+type Screen = "home" | "matchDetail" | "matchResult" | "wallet" | "store" | "profile" | "admin";
 
 const Index = () => {
   const { user, loading } = useAuth();
