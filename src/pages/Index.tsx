@@ -63,6 +63,7 @@ const Index = () => {
         />
       );
     }
+    if (screen === "admin") return <AdminPanel key="admin" onBack={() => { setScreen("home"); setNav("home"); }} />;
     if (screen === "wallet") return <WalletScreen key="wallet" />;
     if (screen === "store") return <StoreScreen key="store" />;
     if (screen === "profile") return <ProfileScreen key="profile" />;
