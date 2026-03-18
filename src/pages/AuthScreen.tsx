@@ -25,7 +25,7 @@ export default function AuthScreen() {
       >
         {/* Logo */}
         <div className="mb-8">
-          <img src={logo} alt="SuperFans" className="h-16 mx-auto mb-2" />
+          <img src={logo} alt="SuperFans" className="h-24 mx-auto mb-2" />
           <div className="text-label text-[13px]">Play. Win. Reward.</div>
         </div>
 
