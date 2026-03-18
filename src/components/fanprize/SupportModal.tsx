@@ -114,7 +114,7 @@ export default function SupportModal({ m, p, onClose, onConfirm }: Props) {
 
             <div className="bg-accent rounded-lg px-3 py-2.5 mb-4 text-center">
               <span className="text-label text-[12px]">You'll earn </span>
-              <span className="text-green font-display font-bold text-[14px]">+100 Support Points 🪙</span>
+              <span className="text-green font-display font-bold text-[14px]">+{pointsEarned} Support Points 🪙</span>
             </div>
 
             <div className="flex gap-2.5">
