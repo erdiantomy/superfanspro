@@ -113,7 +113,7 @@ export default function MatchDetail({ m, onBack, onSupport }: Props) {
             </div>
           </div>
 
-          <SupportBar a={m.supA} b={m.supB} />
+          <SupportBar a={supA} b={supB} />
         </motion.div>
 
         {/* Pool Info */}
