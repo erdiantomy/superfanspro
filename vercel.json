@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "name": "toms-arena",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "framework": "vite",
+  "env": {
+    "VITE_SUPABASE_URL": "https://qsgwtjcrgedjbjsbibxr.supabase.co",
+    "VITE_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_V3fEy78NJsVyztWQ-gqPMw_Sjj-o5Zu",
+    "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFzZ3d0amNyZ2VkamJqc2JpYnhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxOTA0NTEsImV4cCI6MjA4OTc2NjQ1MX0.oaEAJWTGxH5awf2S-NAS3c8x13fm9Xe4Im--5jHLXfE"
+  },
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
