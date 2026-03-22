@@ -73,7 +73,7 @@ npm install
 ### 3. Google OAuth
 1. Supabase Dashboard → Authentication → Providers → Google
 2. Add your Google OAuth credentials
-3. Add redirect URL: `https://yourdomain.com/auth/callback`
+3. Add redirect URL: `https://superfanspro.vercel.app/auth/callback`
 
 ### 4. Environment Variables
 ```env
