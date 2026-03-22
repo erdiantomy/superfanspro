@@ -35,14 +35,14 @@ const App = () => (
             <Route path="/admin"         element={<AdminPage />} />
             <Route path="/host"          element={<HostDashboard />} />
 
-            {/* Auth */}
+            {/* Auth — Google OAuth redirects back here */}
             <Route path="/auth"          element={<AuthScreen />} />
 
             {/* Legacy SuperFansPro */}
             <Route path="/fanprize"      element={<Index />} />
 
             {/* 404 */}
-            <Route path="*"              element={<NotFound />} />
+            <Route path="*"             element={<NotFound />} />
           </Routes>
         </BrowserRouter>
         <Toaster richColors position="top-center" />
