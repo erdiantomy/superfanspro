@@ -245,8 +245,7 @@ export function useRequestJoin() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ sessionId, playerId }: { sessionId: string; playerId: string }) => {
-      const { data, error } = await supabase
-        .from("session_players")
+      const { data, error } = await (supabase.from as any)("session_players")
         .insert({ session_id: sessionId, player_id: playerId, role: "player", status: "pending" })
         .select()
         .single();
