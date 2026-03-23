@@ -69,7 +69,7 @@ export default function AdminPage() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div className="font-display" style={{ fontSize: 20, fontWeight: 900, color: C.orange, letterSpacing: 1 }}>ADMIN PANEL</div>
-            <div style={{ fontSize: 9, color: C.dim, letterSpacing: 1 }}>game.tomspadel.com/admin · Tom's Staff</div>
+            <div style={{ fontSize: 9, color: C.dim, letterSpacing: 1 }}>SuperFans Admin · Staff</div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
