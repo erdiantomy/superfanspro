@@ -281,7 +281,7 @@ export function useScoreSubmissions(sessionId?: string) {
   return useQuery({
     queryKey: ["scores", sessionId],
     queryFn: async () => {
-      let q = supabase.from("score_submissions").select("*");
+      let q = (supabase.from as any)("score_submissions").select("*");
       if (sessionId) q = q.eq("session_id", sessionId);
       else q = q.neq("status", "approved");
       const { data, error } = await q.order("created_at", { ascending: false });
