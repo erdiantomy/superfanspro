@@ -211,8 +211,7 @@ export function useUpdateSession() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<Session> }) => {
-      const { data, error } = await supabase
-        .from("sessions")
+      const { data, error } = await (supabase.from as any)("sessions")
         .update(updates)
         .eq("id", id)
         .select()
