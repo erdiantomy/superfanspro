@@ -24,7 +24,7 @@ const App = () => (
       <TooltipProvider>
         <BrowserRouter>
           <Routes>
-            {/* Tom's Arena — game.tomspadel.com */}
+            {/* SuperFans */}
             <Route path="/"                element={<Landing />} />
             <Route path="/session/:code"   element={<SessionPage />} />
             <Route path="/match/:code"     element={<SessionPage />} />  {/* alias */}

@@ -53,7 +53,7 @@ export default function AdminPage() {
         <div style={{ width: "100%", maxWidth: 360, textAlign: "center" }}>
           <div style={{ fontSize: 44, marginBottom: 12 }}>🛡️</div>
           <div className="font-display" style={{ fontSize: 26, fontWeight: 900, color: C.orange, letterSpacing: 1 }}>STAFF ACCESS</div>
-          <div style={{ fontSize: 12, color: C.muted, marginTop: 4, marginBottom: 24 }}>game.tomspadel.com/admin</div>
+          <div style={{ fontSize: 12, color: C.muted, marginTop: 4, marginBottom: 24 }}>SuperFans Admin</div>
           <input value={pass} onChange={e => setPass(e.target.value)} onKeyDown={e => e.key === "Enter" && setAuthed(pass === "sirapadel7B")} type="password" placeholder="Staff password" style={{ width: "100%", background: C.raised, border: `1px solid ${C.border}`, borderRadius: 12, padding: "12px 16px", color: C.fg, fontSize: 14, outline: "none", marginBottom: 10 }} />
           <button onClick={() => { if (pass === "sirapadel7B") { setAuthed(true); } else { alert("Incorrect password"); setPass(""); } }} style={{ width: "100%", background: C.orange, border: "none", color: "#0A0C11", padding: "13px 0", borderRadius: 12, fontFamily: "'Barlow Condensed'", fontSize: 16, fontWeight: 800, cursor: "pointer", marginBottom: 8 }}>ENTER →</button>
           <button onClick={() => navigate("/")} style={{ width: "100%", background: "none", border: "none", color: C.muted, padding: "8px 0", fontFamily: "'Barlow Condensed'", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>← Back to public</button>
@@ -69,7 +69,7 @@ export default function AdminPage() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div className="font-display" style={{ fontSize: 20, fontWeight: 900, color: C.orange, letterSpacing: 1 }}>ADMIN PANEL</div>
-            <div style={{ fontSize: 9, color: C.dim, letterSpacing: 1 }}>game.tomspadel.com/admin · Tom's Staff</div>
+            <div style={{ fontSize: 9, color: C.dim, letterSpacing: 1 }}>SuperFans Admin · Staff</div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
@@ -102,7 +102,7 @@ export default function AdminPage() {
           <>
             <div style={{ background: "#0E0D0A", border: `1px solid ${C.orange}25`, borderRadius: 12, padding: "10px 14px", marginBottom: 14, fontSize: 11, color: C.muted, lineHeight: 1.8 }}>
               🛡️ Sessions need approval before hosts can share invite links.<br />
-              This prevents unauthorized sessions at Tom's Padel.
+              This prevents unauthorized sessions on SuperFans.
             </div>
             {pendingSessions.length === 0 && (
               <div style={{ textAlign: "center", padding: "24px 0" }}>

@@ -7,6 +7,7 @@ import { useArenaRealtime } from "@/hooks/useRealtime";
 import { getDivision } from "@/lib/gamification";
 import { Av, Tag, StatusTag, CountdownBadge, Divider, XpBar, C, fmtLabel, shareUrl } from "@/components/arena";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/superfans-logo.png";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -29,8 +30,8 @@ export default function Landing() {
       {/* TOP BAR */}
       <div style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, flexShrink: 0, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
-          <div className="font-display" style={{ fontSize: 22, fontWeight: 900, letterSpacing: 2, color: C.green, lineHeight: 1 }}>TOM'S ARENA</div>
-          <div style={{ fontSize: 9, color: C.dim, letterSpacing: 1 }}>game.tomspadel.com · LIVE RANKINGS</div>
+          <img src={logo} alt="SuperFans" style={{ height: 28 }} />
+          <div style={{ fontSize: 9, color: C.dim, letterSpacing: 1 }}>LIVE RANKINGS</div>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {user ? (

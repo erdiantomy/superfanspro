@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────
-// GAMIFICATION ENGINE — Tom's Arena
+// GAMIFICATION ENGINE — SuperFans
 // Single source of truth for all XP/points logic
 // ─────────────────────────────────────────────────────
 
