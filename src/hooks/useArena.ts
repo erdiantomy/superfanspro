@@ -263,8 +263,7 @@ export function useUpdatePlayerStatus() {
     mutationFn: async ({
       id, status, sessionId,
     }: { id: string; status: "approved" | "declined"; sessionId: string }) => {
-      const { data, error } = await supabase
-        .from("session_players")
+      const { data, error } = await (supabase.from as any)("session_players")
         .update({ status, joined_at: status === "approved" ? new Date().toISOString() : null })
         .eq("id", id)
         .select()
