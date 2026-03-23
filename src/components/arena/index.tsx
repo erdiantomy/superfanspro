@@ -210,7 +210,7 @@ export function MatchCard({ court, tA, tB, scoreA, scoreB, done = false, isLive 
 // ─── FORMAT / PARTNER HELPERS ─────────────────────────
 export const fmtLabel = (f: string) => f === "americano" ? "🔄 Americano" : "📊 Mexicano";
 export const ptLabel  = (t: string) => t === "random"    ? "🎲 Random"    : "🤝 Fixed";
-export const shareUrl = (code: string) => `superfanspro.vercel.app/session/${code}`;
+export const shareUrl = (code: string) => `game.tomspadel.com/session/${code}`;
 export const fmtTs    = (ts: string) => {
   const d = new Date(ts);
   return d.toLocaleDateString("id-ID", { day: "numeric", month: "short" }) + " · " + d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });

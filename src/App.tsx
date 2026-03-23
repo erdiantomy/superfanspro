@@ -4,23 +4,18 @@ import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 
-// Tom's Arena pages
 import Landing       from "@/pages/Landing";
 import SessionPage   from "@/pages/SessionPage";
 import AdminPage     from "@/pages/AdminPage";
 import HostDashboard from "@/pages/HostDashboard";
-
-// Auth + legacy
-import AuthScreen from "@/pages/AuthScreen";
-import Index      from "@/pages/Index";
-import NotFound   from "@/pages/NotFound";
+import AuthScreen    from "@/pages/AuthScreen";
+import Index         from "@/pages/Index";
+import NotFound      from "@/pages/NotFound";
 
 import "./App.css";
 
 const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { staleTime: 30_000, retry: 1 },
-  },
+  defaultOptions: { queries: { staleTime: 30_000, retry: 1 } },
 });
 
 const App = () => (
@@ -29,20 +24,17 @@ const App = () => (
       <TooltipProvider>
         <BrowserRouter>
           <Routes>
-            {/* Tom's Arena */}
-            <Route path="/"              element={<Landing />} />
-            <Route path="/session/:code" element={<SessionPage />} />
-            <Route path="/admin"         element={<AdminPage />} />
-            <Route path="/host"          element={<HostDashboard />} />
+            {/* Tom's Arena — game.tomspadel.com */}
+            <Route path="/"                element={<Landing />} />
+            <Route path="/session/:code"   element={<SessionPage />} />
+            <Route path="/match/:code"     element={<SessionPage />} />  {/* alias */}
+            <Route path="/admin"           element={<AdminPage />} />
+            <Route path="/host"            element={<HostDashboard />} />
+            <Route path="/auth"            element={<AuthScreen />} />
 
-            {/* Auth — Google OAuth redirects back here */}
-            <Route path="/auth"          element={<AuthScreen />} />
-
-            {/* Legacy SuperFansPro */}
-            <Route path="/fanprize"      element={<Index />} />
-
-            {/* 404 */}
-            <Route path="*"             element={<NotFound />} />
+            {/* Legacy */}
+            <Route path="/fanprize"        element={<Index />} />
+            <Route path="*"               element={<NotFound />} />
           </Routes>
         </BrowserRouter>
         <Toaster richColors position="top-center" />

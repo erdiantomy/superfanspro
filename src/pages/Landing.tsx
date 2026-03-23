@@ -30,7 +30,7 @@ export default function Landing() {
       <div style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, flexShrink: 0, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <div className="font-display" style={{ fontSize: 22, fontWeight: 900, letterSpacing: 2, color: C.green, lineHeight: 1 }}>TOM'S ARENA</div>
-          <div style={{ fontSize: 9, color: C.dim, letterSpacing: 1 }}>superfanspro.vercel.app · LIVE RANKINGS</div>
+          <div style={{ fontSize: 9, color: C.dim, letterSpacing: 1 }}>game.tomspadel.com · LIVE RANKINGS</div>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {user ? (

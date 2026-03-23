@@ -7,7 +7,7 @@ export default function AuthScreen() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "https://superfanspro.vercel.app",
+        redirectTo: "https://game.tomspadel.com",
       },
     });
     if (error) console.error("Google sign-in error:", error);
