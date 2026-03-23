@@ -7,6 +7,7 @@ import { useArenaRealtime } from "@/hooks/useRealtime";
 import { getDivision } from "@/lib/gamification";
 import { Av, Tag, StatusTag, CountdownBadge, Divider, XpBar, C, fmtLabel, shareUrl } from "@/components/arena";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/superfans-logo.png";
 
 export default function Landing() {
   const navigate = useNavigate();

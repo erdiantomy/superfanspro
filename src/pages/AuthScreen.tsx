@@ -57,7 +57,7 @@ export default function AuthScreen() {
         </button>
 
         <div style={{ fontSize: 10, color: "#3A4560", marginTop: 16, lineHeight: 1.6 }}>
-          By signing in you agree to Tom's Padel Arena terms.<br />
+          By signing in you agree to SuperFans terms.<br />
           Your Google account is linked to your player profile.
         </div>
       </motion.div>

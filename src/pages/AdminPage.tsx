@@ -102,7 +102,7 @@ export default function AdminPage() {
           <>
             <div style={{ background: "#0E0D0A", border: `1px solid ${C.orange}25`, borderRadius: 12, padding: "10px 14px", marginBottom: 14, fontSize: 11, color: C.muted, lineHeight: 1.8 }}>
               🛡️ Sessions need approval before hosts can share invite links.<br />
-              This prevents unauthorized sessions at Tom's Padel.
+              This prevents unauthorized sessions on SuperFans.
             </div>
             {pendingSessions.length === 0 && (
               <div style={{ textAlign: "center", padding: "24px 0" }}>
