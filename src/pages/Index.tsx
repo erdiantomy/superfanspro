@@ -120,11 +120,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground max-w-md mx-auto relative overflow-hidden" style={{ height: "100dvh" }}>
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={screen}
           className="h-full"
-          {...screenTransition}
+          {...directionalTransition(direction)}
         >
           {renderScreen()}
         </motion.div>
