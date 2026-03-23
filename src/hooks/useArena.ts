@@ -312,8 +312,7 @@ export function useRejectScore() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (scoreId: string) => {
-      const { error } = await supabase
-        .from("score_submissions")
+      const { error } = await (supabase.from as any)("score_submissions")
         .update({ status: "rejected", reviewed_at: new Date().toISOString() })
         .eq("id", scoreId);
       if (error) throw error;
