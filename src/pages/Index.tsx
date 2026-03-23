@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { type Match, type Player } from "@/hooks/useData";
 import logo from "@/assets/superfans-logo.png";
 import { AnimatePresence, motion } from "framer-motion";
-import { screenTransition } from "@/components/fanprize/MotionVariants";
+import { screenTransition, directionalTransition } from "@/components/fanprize/MotionVariants";
 import AuthScreen from "@/pages/AuthScreen";
 import HomeScreen from "@/components/fanprize/HomeScreen";
 import MatchDetail from "@/components/fanprize/MatchDetail";
