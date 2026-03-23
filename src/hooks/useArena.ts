@@ -171,8 +171,7 @@ export function useSession(code: string | undefined) {
     queryKey: ["session", code],
     enabled: !!code,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("sessions")
+      const { data, error } = await (supabase.from as any)("sessions")
         .select("*, host:padel_players!sessions_host_id_fkey(*)")
         .eq("code", code!)
         .maybeSingle();
