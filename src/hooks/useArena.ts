@@ -327,8 +327,7 @@ export function useSessionSupports(sessionId: string | undefined) {
     queryKey: ["supports", sessionId],
     enabled: !!sessionId,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("session_supports")
+      const { data, error } = await (supabase.from as any)("session_supports")
         .select("*")
         .eq("session_id", sessionId!);
       if (error) throw error;
