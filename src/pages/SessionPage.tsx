@@ -6,6 +6,7 @@ import { useSessionRealtime } from "@/hooks/useRealtime";
 import { getDivision, cr, resolveSupports } from "@/lib/gamification";
 import { Av, Tag, StatusTag, CountdownBadge, Divider, Row, C, fmtLabel, shareUrl, fmtTs } from "@/components/arena";
 import { toast } from "sonner";
+import logo from "@/assets/superfans-logo.png";
 
 type AuthState = "loading" | "preview" | "unauthenticated" | "pending" | "approved" | "host";
 
