@@ -30,8 +30,8 @@ export default function Landing() {
       {/* TOP BAR */}
       <div style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, flexShrink: 0, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
-          <img src={logo} alt="SuperFans" style={{ height: 40 }} />
-          <div style={{ fontSize: 9, color: C.dim, letterSpacing: 1 }}>LIVE RANKINGS</div>
+          <img src={logo} alt="SuperFans" style={{ width: 140, objectFit: "contain" }} />
+          <div style={{ fontSize: 9, color: C.dim, letterSpacing: 1, marginTop: 2 }}>LIVE RANKINGS</div>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {user ? (
