@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft, Plus, Trash2, Trophy, Save } from "lucide-react";
 import { toast } from "sonner";
+import logo from "@/assets/superfans-logo.png";
 import type { Match } from "@/hooks/useData";
 
 interface MatchForm {
@@ -121,6 +122,7 @@ export default function AdminPanel({ onBack }: { onBack: () => void }) {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border px-4 py-3 flex items-center gap-3">
         <Button variant="ghost" size="icon" onClick={onBack}><ArrowLeft className="h-5 w-5" /></Button>
+        <img src={logo} alt="SuperFans" className="h-6 object-contain" />
         <h1 className="font-display text-lg font-bold tracking-tight">Admin Panel</h1>
         <div className="ml-auto">
           <Button size="sm" onClick={() => setCreating(!creating)}>

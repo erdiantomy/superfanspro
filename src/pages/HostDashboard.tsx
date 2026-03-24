@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePadelPlayer, useCreateSession, useSessions, ensurePadelPlayer } from "@/hooks/useArena";
 import { Tag, StatusTag, C, fmtLabel, shareUrl } from "@/components/arena";
 import { toast } from "sonner";
+import logo from "@/assets/superfans-logo.png";
 
 export default function HostDashboard() {
   const navigate          = useNavigate();
@@ -55,9 +56,12 @@ export default function HostDashboard() {
   return (
     <div style={{ height:"100dvh", background:C.bg, color:C.fg, maxWidth:480, margin:"0 auto", display:"flex", flexDirection:"column", overflow:"hidden", fontFamily:"'DM Sans',sans-serif" }}>
       <div style={{ padding:"12px 16px", borderBottom:`1px solid ${C.border}`, flexShrink:0, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-        <div>
-          <div className="font-display" style={{ fontSize:20, fontWeight:900, color:C.green }}>MY SESSIONS</div>
-          <div style={{ fontSize:10, color:C.dim }}>Host Dashboard · {me?.name}</div>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <img src={logo} alt="SuperFans" style={{ width:100, objectFit:"contain", cursor:"pointer" }} onClick={() => navigate("/")} />
+          <div>
+            <div className="font-display" style={{ fontSize:16, fontWeight:900, color:C.green }}>MY SESSIONS</div>
+            <div style={{ fontSize:10, color:C.dim }}>Host Dashboard · {me?.name}</div>
+          </div>
         </div>
         <div style={{ display:"flex", gap:8 }}>
           <button onClick={() => setView("create")} style={{ background:C.green, border:"none", color:"#0A0C11", padding:"8px 16px", borderRadius:12, fontFamily:"'Barlow Condensed'", fontSize:14, fontWeight:800, cursor:"pointer" }}>+ CREATE</button>
