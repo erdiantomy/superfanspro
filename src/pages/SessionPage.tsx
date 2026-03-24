@@ -6,6 +6,7 @@ import { useSessionRealtime } from "@/hooks/useRealtime";
 import { getDivision, cr, resolveSupports } from "@/lib/gamification";
 import { Av, Tag, StatusTag, CountdownBadge, Divider, Row, C, fmtLabel, shareUrl, fmtTs } from "@/components/arena";
 import { toast } from "sonner";
+import logo from "@/assets/superfans-logo.png";
 
 type AuthState = "loading" | "preview" | "unauthenticated" | "pending" | "approved" | "host";
 
@@ -193,7 +194,9 @@ export default function SessionPage() {
       {/* Header */}
       <div style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-          <button onClick={() => navigate("/")} style={{ background: "none", border: "none", color: C.muted, fontSize: 22, cursor: "pointer" }}>←</button>
+          <button onClick={() => navigate("/")} style={{ background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", alignItems: "center" }}>
+            <img src={logo} alt="SuperFans" style={{ height: 28 }} />
+          </button>
           <div style={{ flex: 1 }}>
             <div className="font-display" style={{ fontSize: 18, fontWeight: 900 }}>{session.name}</div>
             <div style={{ display: "flex", gap: 6, marginTop: 4, flexWrap: "wrap", alignItems: "center" }}>
