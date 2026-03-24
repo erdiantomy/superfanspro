@@ -68,9 +68,12 @@ export default function AdminPage() {
       {/* Header */}
       <div style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, flexShrink: 0, background: "#0E0D0A" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div>
-            <div className="font-display" style={{ fontSize: 20, fontWeight: 900, color: C.orange, letterSpacing: 1 }}>ADMIN PANEL</div>
-            <div style={{ fontSize: 9, color: C.dim, letterSpacing: 1 }}>SuperFans Admin · Staff</div>
+          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            <img src={logo} alt="SuperFans" style={{ width:100, objectFit:"contain", cursor:"pointer" }} onClick={() => navigate("/")} />
+            <div>
+              <div className="font-display" style={{ fontSize:16, fontWeight:900, color:C.orange, letterSpacing:1 }}>ADMIN</div>
+              <div style={{ fontSize:9, color:C.dim, letterSpacing:1 }}>Staff Panel</div>
+            </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
