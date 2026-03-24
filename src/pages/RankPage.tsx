@@ -43,7 +43,7 @@ export default function RankPage() {
               RANKINGS
             </div>
             <div style={{ fontSize: 10, color: C.dim, letterSpacing: 1, marginTop: 2 }}>
-              game.tomspadel.com/rank · LIVE
+              superfanspro.vercel.app/rank · LIVE
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
