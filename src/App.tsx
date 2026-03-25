@@ -7,6 +7,7 @@ import { VenueProvider } from "@/hooks/useVenue";
 
 import Landing       from "@/pages/Landing";
 import VenuePage     from "@/pages/VenuePage";
+import RegisterPage  from "@/pages/RegisterPage";
 import SessionPage   from "@/pages/SessionPage";
 import AdminPage     from "@/pages/AdminPage";
 import HostDashboard from "@/pages/HostDashboard";
