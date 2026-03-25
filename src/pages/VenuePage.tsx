@@ -8,6 +8,7 @@ import { useVenue } from "@/hooks/useVenue";
 import { useArenaRealtime } from "@/hooks/useRealtime";
 import { getDivision } from "@/lib/gamification";
 import { Av, Tag, StatusTag, CountdownBadge, Divider, XpBar, C, fmtLabel } from "@/components/arena";
+import CreditsDisplay from "@/components/wallet/CreditsDisplay";
 import type { PadelPlayer, Session } from "@/hooks/useArena";
 
 function fmtRp(n: number) {
@@ -136,6 +137,7 @@ export default function VenuePage() {
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {user ? (
             <>
+              <CreditsDisplay />
               <button onClick={() => navigate(`/${slug}/host`)} style={{ background: `${accent}18`, border: `1px solid ${accent}40`, color: accent, padding: "6px 12px", borderRadius: 10, fontFamily: "'Barlow Condensed'", fontSize: 12, fontWeight: 800, cursor: "pointer" }}>+ SESSION</button>
               <button onClick={() => navigate(`/${slug}/admin`)} style={{ background: `${C.orange}15`, border: `1px solid ${C.orange}40`, color: C.orange, padding: "6px 10px", borderRadius: 10, fontFamily: "'Barlow Condensed'", fontSize: 11, fontWeight: 800, cursor: "pointer" }}>🛡</button>
             </>
