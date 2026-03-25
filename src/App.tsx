@@ -7,6 +7,7 @@ import { VenueProvider } from "@/hooks/useVenue";
 
 import Landing       from "@/pages/Landing";
 import VenuePage     from "@/pages/VenuePage";
+import RegisterPage  from "@/pages/RegisterPage";
 import SessionPage   from "@/pages/SessionPage";
 import AdminPage     from "@/pages/AdminPage";
 import HostDashboard from "@/pages/HostDashboard";
@@ -45,6 +46,7 @@ const App = () => (
             {/* Platform-level routes */}
             <Route path="/"           element={<Landing />} />
             <Route path="/auth"       element={<AuthScreen />} />
+            <Route path="/register"  element={<RegisterPage />} />
             <Route path="/fanprize"   element={<Index />} />
 
             {/* Backwards-compat redirects: old flat routes → /tomspadel/* */}

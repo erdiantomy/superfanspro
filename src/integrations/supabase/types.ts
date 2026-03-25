@@ -184,6 +184,132 @@ export type Database = {
         }
         Relationships: []
       }
+      venue_registrations: {
+        Row: {
+          admin_password_hash: string | null
+          city: string
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          country: string
+          courts: number
+          created_at: string
+          id: string
+          logo_url: string | null
+          monthly_prize: number | null
+          primary_color: string | null
+          prize_split_1st: number | null
+          prize_split_2nd: number | null
+          prize_split_3rd: number | null
+          slug: string
+          status: string
+          venue_name: string
+        }
+        Insert: {
+          admin_password_hash?: string | null
+          city: string
+          contact_email: string
+          contact_name: string
+          contact_phone: string
+          country?: string
+          courts?: number
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          monthly_prize?: number | null
+          primary_color?: string | null
+          prize_split_1st?: number | null
+          prize_split_2nd?: number | null
+          prize_split_3rd?: number | null
+          slug: string
+          status?: string
+          venue_name: string
+        }
+        Update: {
+          admin_password_hash?: string | null
+          city?: string
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string
+          country?: string
+          courts?: number
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          monthly_prize?: number | null
+          primary_color?: string | null
+          prize_split_1st?: number | null
+          prize_split_2nd?: number | null
+          prize_split_3rd?: number | null
+          slug?: string
+          status?: string
+          venue_name?: string
+        }
+        Relationships: []
+      }
+      venues: {
+        Row: {
+          admin_password_hash: string | null
+          city: string | null
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          country: string | null
+          courts_default: number | null
+          created_at: string
+          id: string
+          logo_url: string | null
+          monthly_prize: number | null
+          name: string
+          primary_color: string | null
+          prize_split_1st: number | null
+          prize_split_2nd: number | null
+          prize_split_3rd: number | null
+          slug: string
+          status: string
+        }
+        Insert: {
+          admin_password_hash?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          courts_default?: number | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          monthly_prize?: number | null
+          name: string
+          primary_color?: string | null
+          prize_split_1st?: number | null
+          prize_split_2nd?: number | null
+          prize_split_3rd?: number | null
+          slug: string
+          status?: string
+        }
+        Update: {
+          admin_password_hash?: string | null
+          city?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          country?: string | null
+          courts_default?: number | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          monthly_prize?: number | null
+          name?: string
+          primary_color?: string | null
+          prize_split_1st?: number | null
+          prize_split_2nd?: number | null
+          prize_split_3rd?: number | null
+          slug?: string
+          status?: string
+        }
+        Relationships: []
+      }
       wallet_transactions: {
         Row: {
           created_at: string
