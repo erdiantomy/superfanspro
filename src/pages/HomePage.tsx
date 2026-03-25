@@ -316,7 +316,7 @@ function HowItWorksSection() {
   );
 }
 
-
+export default function HomePage() {
   const navigate = useNavigate();
 
   const { data: venues = [] } = useQuery({
