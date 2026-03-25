@@ -9,12 +9,13 @@ import Landing       from "@/pages/Landing";
 import VenuePage     from "@/pages/VenuePage";
 import RegisterPage  from "@/pages/RegisterPage";
 import SessionPage   from "@/pages/SessionPage";
-import AdminPage     from "@/pages/AdminPage";
-import HostDashboard from "@/pages/HostDashboard";
-import RankPage      from "@/pages/RankPage";
-import AuthScreen    from "@/pages/AuthScreen";
-import Index         from "@/pages/Index";
-import NotFound      from "@/pages/NotFound";
+import AdminPage      from "@/pages/AdminPage";
+import SuperAdminPage from "@/pages/SuperAdminPage";
+import HostDashboard  from "@/pages/HostDashboard";
+import RankPage       from "@/pages/RankPage";
+import AuthScreen     from "@/pages/AuthScreen";
+import Index          from "@/pages/Index";
+import NotFound       from "@/pages/NotFound";
 
 import "./App.css";
 
