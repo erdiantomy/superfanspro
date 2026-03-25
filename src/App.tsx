@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
 import { VenueProvider } from "@/hooks/useVenue";
 
-import Landing       from "@/pages/Landing";
+import HomePage       from "@/pages/HomePage";
 import VenuePage     from "@/pages/VenuePage";
 import RegisterPage  from "@/pages/RegisterPage";
 import SessionPage   from "@/pages/SessionPage";
@@ -45,7 +45,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             {/* Platform-level routes */}
-            <Route path="/"           element={<Landing />} />
+            <Route path="/"           element={<HomePage />} />
             <Route path="/auth"       element={<AuthScreen />} />
             <Route path="/register"  element={<RegisterPage />} />
             <Route path="/fanprize"   element={<Index />} />
