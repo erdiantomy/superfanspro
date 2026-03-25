@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, useParams } from "react-router-dom";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/useAuth";
@@ -20,6 +20,16 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, retry: 1 } },
 });
 
+/** Redirect old /session/:code → /tomspadel/session/:code */
+const LegacySessionRedirect = () => {
+  const { code } = useParams();
+  return <Navigate to={`/tomspadel/session/${code}`} replace />;
+};
+const LegacyMatchRedirect = () => {
+  const { code } = useParams();
+  return <Navigate to={`/tomspadel/match/${code}`} replace />;
+};
+
 /** Wrap venue-scoped pages with VenueProvider */
 const VenueLayout = ({ children }: { children: React.ReactNode }) => (
   <VenueProvider>{children}</VenueProvider>
@@ -36,12 +46,12 @@ const App = () => (
             <Route path="/auth"       element={<AuthScreen />} />
             <Route path="/fanprize"   element={<Index />} />
 
-            {/* Backwards-compat redirects: old flat routes → tomspadel */}
+            {/* Backwards-compat redirects: old flat routes → /tomspadel/* */}
             <Route path="/rank"            element={<Navigate to="/tomspadel/rank" replace />} />
             <Route path="/host"            element={<Navigate to="/tomspadel/host" replace />} />
             <Route path="/admin"           element={<Navigate to="/tomspadel/admin" replace />} />
-            <Route path="/session/:code"   element={<Navigate to="/tomspadel/session/:code" replace />} />
-            <Route path="/match/:code"     element={<Navigate to="/tomspadel/match/:code" replace />} />
+            <Route path="/session/:code"   element={<LegacySessionRedirect />} />
+            <Route path="/match/:code"     element={<LegacyMatchRedirect />} />
 
             {/* Venue-scoped routes */}
             <Route path="/:slug/rank"          element={<VenueLayout><RankPage /></VenueLayout>} />
