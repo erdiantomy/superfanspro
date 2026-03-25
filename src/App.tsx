@@ -46,6 +46,7 @@ const App = () => (
             {/* Platform-level routes */}
             <Route path="/"           element={<Landing />} />
             <Route path="/auth"       element={<AuthScreen />} />
+            <Route path="/register"  element={<RegisterPage />} />
             <Route path="/fanprize"   element={<Index />} />
 
             {/* Backwards-compat redirects: old flat routes → /tomspadel/* */}
