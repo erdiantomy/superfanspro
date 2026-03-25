@@ -6,6 +6,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { VenueProvider } from "@/hooks/useVenue";
 
 import Landing       from "@/pages/Landing";
+import VenuePage     from "@/pages/VenuePage";
 import SessionPage   from "@/pages/SessionPage";
 import AdminPage     from "@/pages/AdminPage";
 import HostDashboard from "@/pages/HostDashboard";
@@ -54,6 +55,7 @@ const App = () => (
             <Route path="/match/:code"     element={<LegacyMatchRedirect />} />
 
             {/* Venue-scoped routes */}
+            <Route path="/:slug"               element={<VenueLayout><VenuePage /></VenueLayout>} />
             <Route path="/:slug/rank"          element={<VenueLayout><RankPage /></VenueLayout>} />
             <Route path="/:slug/host"          element={<VenueLayout><HostDashboard /></VenueLayout>} />
             <Route path="/:slug/admin"         element={<VenueLayout><AdminPage /></VenueLayout>} />
