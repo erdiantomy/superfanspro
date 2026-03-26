@@ -358,6 +358,23 @@ export default function HomePage() {
             See a live example
           </button>
         </div>
+
+        {/* App Demo Video */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          style={{ marginTop: 40, borderRadius: 20, overflow: "hidden", border: "1px solid #eee", boxShadow: "0 8px 40px rgba(0,0,0,0.08)" }}
+        >
+          <video
+            src="/videos/app-demo.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            style={{ width: "100%", display: "block" }}
+          />
+        </motion.div>
       </section>
 
       {/* DIVIDER */}
