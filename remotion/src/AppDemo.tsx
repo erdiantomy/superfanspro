@@ -1,6 +1,7 @@
 import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, Sequence, staticFile, Img } from "remotion";
 import { TransitionSeries, springTiming } from "@remotion/transitions";
 import { slide } from "@remotion/transitions/slide";
+import { fade } from "@remotion/transitions/fade";
 import { loadFont } from "@remotion/google-fonts/BarlowCondensed";
 import { loadFont as loadDM } from "@remotion/google-fonts/DMSans";
 
@@ -606,6 +607,13 @@ export const AppDemo: React.FC = () => {
           />
           <TransitionSeries.Sequence durationInFrames={140}>
             <WalletScreen />
+          </TransitionSeries.Sequence>
+          <TransitionSeries.Transition
+            presentation={fade()}
+            timing={springTiming({ config: { damping: 200 }, durationInFrames: 30 })}
+          />
+          <TransitionSeries.Sequence durationInFrames={60}>
+            <VenueLanding />
           </TransitionSeries.Sequence>
         </TransitionSeries>
       </PhoneFrame>
