@@ -386,13 +386,15 @@ export default function HomePage() {
             {/* Screen */}
             <div style={{ borderRadius: 30, overflow: "hidden", background: "#000" }}>
               <video
-                src="/videos/app-demo.mp4"
                 autoPlay
                 loop
                 muted
                 playsInline
                 style={{ width: "100%", display: "block" }}
-              />
+              >
+                <source src="/videos/app-demo.webm" type="video/webm" />
+                <source src="/videos/app-demo.mp4" type="video/mp4" />
+              </video>
             </div>
             {/* Home indicator */}
             <div style={{
