@@ -95,13 +95,13 @@ function HowItWorksSection() {
       </p>
 
       {/* Role Tabs */}
-      <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 32, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", justifyContent: "center", gap: 6, marginBottom: 32, flexWrap: "wrap" }}>
         {ROLE_TABS.map(t => (
           <button
             key={t.key}
             onClick={() => setActiveRole(t.key)}
             style={{
-              padding: "10px 20px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer",
+              padding: "8px 14px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer",
               border: activeRole === t.key ? `2px solid ${t.color}` : "2px solid #eee",
               background: activeRole === t.key ? `${t.color}12` : "#fff",
               color: activeRole === t.key ? t.color : "#888",
@@ -152,22 +152,14 @@ function HowItWorksSection() {
                 transition={{ delay: i * 0.08 + 0.05 }}
                 style={{
                   flex: 1, background: "#fff", border: "1px solid #eee", borderRadius: 14,
-                  padding: "16px 18px", marginBottom: i < flow.length - 1 ? 0 : 0,
-                  display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12,
-                  marginTop: 0, marginLeft: 0,
+                  padding: "14px 14px",
+                  display: "flex", flexDirection: "column", gap: 8,
+                  marginTop: 0, marginLeft: 0, minWidth: 0,
                 }}
               >
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{step.title}</div>
-                  <div style={{ fontSize: 13, color: "#666", lineHeight: 1.6 }}>{step.desc}</div>
-                </div>
-                <div style={{
-                  background: `${tab.color}10`, borderRadius: 10, padding: "8px 12px",
-                  fontSize: 16, fontWeight: 800, color: tab.color, whiteSpace: "nowrap",
-                  fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: 1,
-                  border: `1px solid ${tab.color}20`,
-                }}>
-                  {step.visual}
+                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{step.title}</div>
+                  <div style={{ fontSize: 12, color: "#666", lineHeight: 1.6 }}>{step.desc}</div>
                 </div>
               </motion.div>
             </div>
@@ -181,7 +173,7 @@ function HowItWorksSection() {
         <p style={{ textAlign: "center", fontSize: 22, fontWeight: 800, marginBottom: 28, fontFamily: "'Barlow Condensed', sans-serif" }}>XP System & Divisions</p>
 
         {/* Division Badges */}
-        <div style={{ display: "flex", justifyContent: "center", gap: 10, flexWrap: "wrap", marginBottom: 24 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(70px, 1fr))", gap: 8, marginBottom: 24, maxWidth: 500, margin: "0 auto 24px" }}>
           {DIVISIONS.map((d, i) => (
             <motion.div
               key={d.label}
@@ -189,33 +181,32 @@ function HowItWorksSection() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.06 }}
-              whileHover={{ scale: 1.08, y: -4 }}
               style={{
                 background: `${d.color}12`, border: `2px solid ${d.color}40`, borderRadius: 14,
-                padding: "12px 16px", textAlign: "center", minWidth: 80, cursor: "default",
+                padding: "10px 8px", textAlign: "center", cursor: "default",
               }}
             >
-              <div style={{ fontSize: 24 }}>{d.icon}</div>
-              <div style={{ fontSize: 13, fontWeight: 800, color: d.color, marginTop: 4 }}>{d.label}</div>
-              <div style={{ fontSize: 11, color: "#999", marginTop: 2 }}>{d.min} XP</div>
+              <div style={{ fontSize: 20 }}>{d.icon}</div>
+              <div style={{ fontSize: 11, fontWeight: 800, color: d.color, marginTop: 4 }}>{d.label}</div>
+              <div style={{ fontSize: 10, color: "#999", marginTop: 2 }}>{d.min} XP</div>
             </motion.div>
           ))}
         </div>
 
         {/* XP Table */}
-        <div style={{ background: "#f9f9f9", borderRadius: 14, padding: "20px", border: "1px solid #eee", maxWidth: 600, margin: "0 auto" }}>
+        <div style={{ background: "#f9f9f9", borderRadius: 14, padding: "16px", border: "1px solid #eee", maxWidth: 600, margin: "0 auto", overflowX: "auto" }}>
           <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12, color: "#444" }}>📊 XP Earned Per Match</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, fontSize: 12 }}>
-            <div style={{ fontWeight: 800, color: "#999", fontSize: 10, textTransform: "uppercase", letterSpacing: 1 }}>Result</div>
-            <div style={{ fontWeight: 800, color: "#999", fontSize: 10, textTransform: "uppercase", letterSpacing: 1 }}>Rank #1</div>
-            <div style={{ fontWeight: 800, color: "#999", fontSize: 10, textTransform: "uppercase", letterSpacing: 1 }}>Rank #3</div>
-            <div style={{ fontWeight: 800, color: "#999", fontSize: 10, textTransform: "uppercase", letterSpacing: 1 }}>Rank #6</div>
+          <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr 1fr", gap: "6px 8px", fontSize: 11, minWidth: 280 }}>
+            <div style={{ fontWeight: 800, color: "#999", fontSize: 9, textTransform: "uppercase", letterSpacing: 1 }}>Result</div>
+            <div style={{ fontWeight: 800, color: "#999", fontSize: 9, textTransform: "uppercase", letterSpacing: 1 }}>Rank #1</div>
+            <div style={{ fontWeight: 800, color: "#999", fontSize: 9, textTransform: "uppercase", letterSpacing: 1 }}>Rank #3</div>
+            <div style={{ fontWeight: 800, color: "#999", fontSize: 9, textTransform: "uppercase", letterSpacing: 1 }}>Rank #6</div>
             {XP_TABLE.map(row => (
               <>
-                <div key={row.result} style={{ fontWeight: 700, color: row.result === "Win" ? GREEN : "#e74c3c" }}>{row.result === "Win" ? "✅ Win" : "❌ Loss"}</div>
-                <div style={{ color: "#333" }}>{row.rank1}</div>
-                <div style={{ color: "#333" }}>{row.rank3}</div>
-                <div style={{ color: "#333" }}>{row.rank6}</div>
+                <div key={row.result} style={{ fontWeight: 700, color: row.result === "Win" ? GREEN : "#e74c3c", whiteSpace: "nowrap" }}>{row.result === "Win" ? "✅ Win" : "❌ Loss"}</div>
+                <div style={{ color: "#333", fontSize: 10 }}>{row.rank1}</div>
+                <div style={{ color: "#333", fontSize: 10 }}>{row.rank3}</div>
+                <div style={{ color: "#333", fontSize: 10 }}>{row.rank6}</div>
               </>
             ))}
           </div>
@@ -332,29 +323,29 @@ export default function HomePage() {
     <div style={{ background: "#fff", color: "#111", fontFamily: "'DM Sans', -apple-system, sans-serif" }}>
 
       {/* NAV */}
-      <nav style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 24px", maxWidth: 960, margin: "0 auto" }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-          <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22, fontWeight: 900, letterSpacing: 1 }}>SUPERFANS</span>
-          <span style={{ fontSize: 10, color: "#999", letterSpacing: 1 }}>.GAMES</span>
+      <nav style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", maxWidth: 960, margin: "0 auto" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+          <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 20, fontWeight: 900, letterSpacing: 1 }}>SUPERFANS</span>
+          <span style={{ fontSize: 9, color: "#999", letterSpacing: 1 }}>.GAMES</span>
         </div>
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <button onClick={() => navigate("/register")} style={{ background: GREEN, color: "#111", border: "none", padding: "8px 18px", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Register Venue</button>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <button onClick={() => navigate("/register")} style={{ background: GREEN, color: "#111", border: "none", padding: "7px 14px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Register Venue</button>
         </div>
       </nav>
 
       {/* HERO */}
-      <section style={{ textAlign: "center", padding: "60px 24px 48px", maxWidth: 640, margin: "0 auto" }}>
+      <section style={{ textAlign: "center", padding: "40px 16px 36px", maxWidth: 640, margin: "0 auto" }}>
         <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ fontSize: "clamp(28px, 6vw, 44px)", fontWeight: 900, lineHeight: 1.1, marginBottom: 16, fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: -0.5 }}>
           Your Padel Venue.<br /><span style={{ color: GREEN }}>Fully Gamified.</span>
         </motion.h1>
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }} style={{ fontSize: 16, color: "#555", lineHeight: 1.7, marginBottom: 32, maxWidth: 480, margin: "0 auto 32px" }}>
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }} style={{ fontSize: 15, color: "#555", lineHeight: 1.7, marginBottom: 28, maxWidth: 480, margin: "0 auto 28px" }}>
           Live rankings, XP points, monthly prizes, and a player support economy — out of the box.
         </motion.p>
-        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <button onClick={() => navigate("/register")} style={{ background: "#111", color: "#fff", border: "none", padding: "14px 32px", borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
+        <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+          <button onClick={() => navigate("/register")} style={{ background: "#111", color: "#fff", border: "none", padding: "12px 24px", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer", width: "100%", maxWidth: 280 }}>
             Register Your Venue →
           </button>
-          <button onClick={() => navigate("/tomspadel")} style={{ background: "transparent", color: "#555", border: "1px solid #ddd", padding: "14px 24px", borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
+          <button onClick={() => navigate("/tomspadel")} style={{ background: "transparent", color: "#555", border: "1px solid #ddd", padding: "12px 20px", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", width: "100%", maxWidth: 280 }}>
             See a live example
           </button>
         </div>
@@ -418,7 +409,7 @@ export default function HomePage() {
         <div style={{ maxWidth: 800, margin: "0 auto" }}>
           <h2 style={{ textAlign: "center", fontSize: 11, fontWeight: 800, letterSpacing: 2, color: GREEN, textTransform: "uppercase", marginBottom: 8 }}>Features</h2>
           <p style={{ textAlign: "center", fontSize: 24, fontWeight: 800, marginBottom: 32, fontFamily: "'Barlow Condensed', sans-serif" }}>Everything your venue needs</p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12 }}>
             {FEATURES.map((f, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} style={{ background: "#fff", borderRadius: 14, padding: "20px 18px", border: "1px solid #eee" }}>
                 <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
@@ -435,7 +426,7 @@ export default function HomePage() {
         <section style={{ padding: "48px 24px", maxWidth: 800, margin: "0 auto" }}>
           <h2 style={{ textAlign: "center", fontSize: 11, fontWeight: 800, letterSpacing: 2, color: GREEN, textTransform: "uppercase", marginBottom: 8 }}>Active Venues</h2>
           <p style={{ textAlign: "center", fontSize: 24, fontWeight: 800, marginBottom: 32, fontFamily: "'Barlow Condensed', sans-serif" }}>Already on SuperFans</p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12 }}>
             {venues.map(v => (
               <div key={v.id} style={{ background: "#fff", border: "1px solid #eee", borderRadius: 14, padding: "18px 16px", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 10 }}>
                 {v.logo_url ? (
@@ -480,13 +471,13 @@ export default function HomePage() {
       </section>
 
       {/* FOOTER */}
-      <footer style={{ padding: "32px 24px", maxWidth: 800, margin: "0 auto", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
+      <footer style={{ padding: "28px 16px", maxWidth: 800, margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, textAlign: "center" }}>
         <div>
           <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 18, fontWeight: 900, letterSpacing: 1 }}>SUPERFANS</span>
           <span style={{ fontSize: 9, color: "#999", letterSpacing: 1 }}>.GAMES</span>
           <div style={{ fontSize: 12, color: "#999", marginTop: 4 }}>Built for padel communities across Southeast Asia</div>
         </div>
-        <div style={{ display: "flex", gap: 20 }}>
+        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
           {[
             { label: "Register", to: "/register" },
             { label: "How it works", to: "/#how-it-works" },
