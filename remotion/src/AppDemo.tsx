@@ -1,4 +1,4 @@
-import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, Sequence } from "remotion";
+import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, Sequence, staticFile, Img } from "remotion";
 import { TransitionSeries, springTiming } from "@remotion/transitions";
 import { slide } from "@remotion/transitions/slide";
 import { loadFont } from "@remotion/google-fonts/BarlowCondensed";
@@ -510,12 +510,61 @@ const WalletScreen: React.FC = () => {
 const T = 25;
 
 export const AppDemo: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  // Subtle pulsing glow behind the phone
+  const glowPulse = interpolate(Math.sin(frame * 0.04), [-1, 1], [0.15, 0.35]);
+  const glowScale = interpolate(Math.sin(frame * 0.025), [-1, 1], [0.95, 1.08]);
+
+  // Logo watermark fade in
+  const logoOpacity = interpolate(frame, [0, 40], [0, 0.12], { extrapolateRight: "clamp" });
+
   return (
     <AbsoluteFill>
       {/* Background */}
       <AbsoluteFill style={{
         background: "linear-gradient(160deg, #07090D 0%, #0B0E16 40%, #0D1118 100%)",
       }} />
+
+      {/* Glow effect behind phone */}
+      <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", zIndex: 0 }}>
+        <div style={{
+          width: 500, height: 900, borderRadius: "50%",
+          background: `radial-gradient(ellipse at center, rgba(0,230,118,${glowPulse}) 0%, rgba(0,230,118,0.05) 40%, transparent 70%)`,
+          transform: `scale(${glowScale})`,
+          filter: "blur(60px)",
+        }} />
+      </AbsoluteFill>
+
+      {/* Secondary accent glow */}
+      <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", zIndex: 0 }}>
+        <div style={{
+          width: 300, height: 600, borderRadius: "50%",
+          background: `radial-gradient(ellipse at center, rgba(0,230,118,${glowPulse * 0.6}) 0%, transparent 60%)`,
+          transform: `scale(${glowScale * 1.1}) translateY(-50px)`,
+          filter: "blur(40px)",
+        }} />
+      </AbsoluteFill>
+
+      {/* Logo watermark top-left */}
+      <div style={{
+        position: "absolute", top: 40, left: 50, zIndex: 20,
+        opacity: logoOpacity,
+      }}>
+        <Img src={staticFile("superfans-logo.png")} style={{ height: 40 }} />
+      </div>
+
+      {/* Logo watermark bottom-right */}
+      <div style={{
+        position: "absolute", bottom: 40, right: 50, zIndex: 20,
+        opacity: logoOpacity, display: "flex", alignItems: "center", gap: 8,
+      }}>
+        <Img src={staticFile("superfans-logo.png")} style={{ height: 32 }} />
+        <span style={{ fontFamily: display, fontSize: 14, color: `rgba(0,230,118,${logoOpacity * 3})`, letterSpacing: 2, fontWeight: 700 }}>
+          superfans.games
+        </span>
+      </div>
 
       {/* Floating label */}
       <Sequence from={20}>
