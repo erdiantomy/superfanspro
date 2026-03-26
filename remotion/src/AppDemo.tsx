@@ -631,7 +631,7 @@ const FloatingLabel: React.FC = () => {
     { text: "Live Session", start: 155, end: 290 },
     { text: "Leaderboard & Divisions", start: 290, end: 425 },
     { text: "Support Economy", start: 425, end: 560 },
-    { text: "Wallet & Credits", start: 560, end: 680 },
+    { text: "Wallet & Credits", start: 560, end: 660 },
   ];
 
   return (
