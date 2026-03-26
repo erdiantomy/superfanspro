@@ -359,21 +359,44 @@ export default function HomePage() {
           </button>
         </div>
 
-        {/* App Demo Video */}
+        {/* App Demo Video in Phone Mockup */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.6 }}
-          style={{ marginTop: 40, borderRadius: 20, overflow: "hidden", border: "1px solid #eee", boxShadow: "0 8px 40px rgba(0,0,0,0.08)" }}
+          style={{ marginTop: 40, display: "flex", justifyContent: "center" }}
         >
-          <video
-            src="/videos/app-demo.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            style={{ width: "100%", display: "block" }}
-          />
+          <div style={{
+            width: 280,
+            background: "#111",
+            borderRadius: 40,
+            padding: "14px 10px",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.1) inset",
+            position: "relative",
+          }}>
+            {/* Notch */}
+            <div style={{
+              position: "absolute", top: 10, left: "50%", transform: "translateX(-50%)",
+              width: 80, height: 22, background: "#111", borderRadius: 12, zIndex: 2,
+              border: "1px solid #222",
+            }} />
+            {/* Screen */}
+            <div style={{ borderRadius: 30, overflow: "hidden", background: "#000" }}>
+              <video
+                src="/videos/app-demo.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                style={{ width: "100%", display: "block" }}
+              />
+            </div>
+            {/* Home indicator */}
+            <div style={{
+              width: 100, height: 4, background: "#444", borderRadius: 2,
+              margin: "8px auto 0",
+            }} />
+          </div>
         </motion.div>
       </section>
 
