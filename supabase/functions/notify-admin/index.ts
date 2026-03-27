@@ -1,6 +1,6 @@
 // Edge Function: notify-admin
 // Sends email notifications to the super admin (superfans.games@gmail.com)
-// for venue registrations, session approvals, and other admin events.
+// for venue registrations, session approvals, score submissions, payments, etc.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -9,7 +9,7 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "
 const ADMIN_EMAIL = "superfans.games@gmail.com";
 
 interface AdminNotification {
-  type: "venue_registration" | "session_request" | "payment_completed" | "general";
+  type: "venue_registration" | "session_request" | "payment_completed" | "score_submitted" | "general";
   subject: string;
   body: string;
   metadata?: Record<string, string>;
@@ -26,6 +26,7 @@ function buildEmailHtml(notification: AdminNotification): string {
     venue_registration: "🏟️",
     session_request: "🎾",
     payment_completed: "💰",
+    score_submitted: "📊",
     general: "📢",
   };
 
@@ -56,7 +57,6 @@ function buildEmailHtml(notification: AdminNotification): string {
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response("ok", {
       headers: {
@@ -72,19 +72,13 @@ Deno.serve(async (req) => {
     if (!notification.subject || !notification.body) {
       return new Response(JSON.stringify({ error: "subject and body required" }), {
         status: 400,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
       });
     }
 
-    // Use Supabase Auth admin to send email via the built-in email service
-    // Since we can't use Resend without a key, we'll use the Supabase
-    // service role to call the admin API and send a magic link as a workaround,
-    // OR we invoke the project's SMTP/email infra directly.
-    
-    // For now, store the notification in a table and send via fetch to an email API
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Store admin notification log
+    // Log the notification
     await supabase.from("admin_notifications").insert({
       type: notification.type,
       subject: notification.subject,
@@ -93,12 +87,8 @@ Deno.serve(async (req) => {
       recipient: ADMIN_EMAIL,
     });
 
-    // Try sending via Lovable Cloud email (internal SMTP)
-    // The edge function environment has access to the project's email infra
+    // Try sending via internal email function
     const emailHtml = buildEmailHtml(notification);
-    
-    // Use the built-in Supabase email sending via the auth.admin API
-    // We send using a direct SMTP approach via the Supabase internal mail service
     const response = await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
       method: "POST",
       headers: {
@@ -112,7 +102,6 @@ Deno.serve(async (req) => {
       }),
     });
 
-    // If the internal send-email function doesn't exist yet, log it
     const emailResult = response.ok ? await response.json() : { fallback: true, status: response.status };
 
     return new Response(JSON.stringify({ 
@@ -122,18 +111,12 @@ Deno.serve(async (req) => {
       email_result: emailResult,
     }), {
       status: 200,
-      headers: { 
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
     });
   } catch (error) {
     return new Response(JSON.stringify({ error: (error as Error).message }), {
       status: 500,
-      headers: { 
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
     });
   }
 });
