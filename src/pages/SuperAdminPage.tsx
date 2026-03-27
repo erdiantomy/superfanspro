@@ -109,6 +109,18 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+/* ── Time ago helper ────────────────────────────────── */
+function getTimeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return days === 1 ? "1d ago" : `${days}d ago`;
+}
+
 /* ── Shared styles ──────────────────────────────────── */
 const inputStyle: React.CSSProperties = {
   width: "100%", background: "#14161E", border: "1px solid #1E2235",
@@ -173,6 +185,35 @@ function Dashboard() {
   const [tab, setTab] = useState<TabKey>("overview");
 
   // ─── Data queries ────────────────────────────────
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ["sa-unread-notifs"],
+    refetchInterval: 15000,
+    queryFn: async () => {
+      const { count, error } = await (supabase as any).from("admin_notifications").select("*", { count: "exact", head: true }).eq("read", false);
+      if (error) return 0;
+      return count ?? 0;
+    },
+  });
+
+  const { data: recentNotifs = [], refetch: refetchNotifs } = useQuery({
+    queryKey: ["sa-recent-notifs"],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any).from("admin_notifications").select("*").order("created_at", { ascending: false }).limit(20);
+      if (error) return [];
+      return data ?? [];
+    },
+  });
+
+  const [showNotifs, setShowNotifs] = useState(false);
+
+  const markAllRead = async () => {
+    const unreadIds = recentNotifs.filter((n: any) => !n.read).map((n: any) => n.id);
+    if (unreadIds.length === 0) return;
+    await (supabase as any).from("admin_notifications").update({ read: true }).in("id", unreadIds);
+    qc.invalidateQueries({ queryKey: ["sa-unread-notifs"] });
+    refetchNotifs();
+  };
+
   const { data: venues = [] } = useQuery({
     queryKey: ["sa-venues"],
     queryFn: async () => {
@@ -263,7 +304,13 @@ function Dashboard() {
             <div className="font-display" style={{ fontSize: 20, fontWeight: 900, color: C.orange, letterSpacing: 1 }}>SUPERFANS HQ</div>
             <div style={{ fontSize: 9, color: C.dim, letterSpacing: 1 }}>PLATFORM SUPER ADMIN</div>
           </div>
-          <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            <button onClick={() => setShowNotifs(v => !v)} style={{ ...headerBtnStyle, position: "relative", fontSize: 16, padding: "6px 10px" }}>
+              🔔
+              {unreadCount > 0 && (
+                <span style={{ position: "absolute", top: -4, right: -4, background: C.red, color: "#fff", fontSize: 9, fontWeight: 900, borderRadius: 10, padding: "1px 5px", minWidth: 16, textAlign: "center", lineHeight: "14px" }}>{unreadCount > 99 ? "99+" : unreadCount}</span>
+              )}
+            </button>
             <button onClick={() => navigate("/")} style={headerBtnStyle}>← Home</button>
             <button onClick={signOut} style={{ ...headerBtnStyle, color: C.red, borderColor: C.red + "30" }}>Sign Out</button>
           </div>
@@ -271,7 +318,42 @@ function Dashboard() {
         <div style={{ fontSize: 10, color: C.dim, marginTop: 4 }}>Logged in as {user?.email}</div>
       </div>
 
-      {/* Tabs */}
+      {/* Notifications dropdown */}
+      {showNotifs && (
+        <div style={{ position: "relative", zIndex: 50 }}>
+          <div onClick={() => setShowNotifs(false)} style={{ position: "fixed", inset: 0 }} />
+          <div style={{ position: "absolute", right: 16, top: 0, width: 340, maxHeight: 400, overflowY: "auto", background: "#14161E", border: "1px solid #1E2235", borderRadius: 14, boxShadow: "0 8px 32px rgba(0,0,0,0.5)", zIndex: 51 }}>
+            <div style={{ padding: "12px 14px", borderBottom: "1px solid #1E2235", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: C.fg }}>🔔 Notifications</span>
+              {unreadCount > 0 && (
+                <button onClick={markAllRead} style={{ background: "none", border: "none", color: C.green, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Mark all read</button>
+              )}
+            </div>
+            {recentNotifs.length === 0 ? (
+              <div style={{ padding: 24, textAlign: "center", fontSize: 12, color: C.muted }}>No notifications yet</div>
+            ) : (
+              recentNotifs.map((n: any) => {
+                const typeEmoji: Record<string, string> = { venue_registration: "🏟️", session_request: "🎾", payment_completed: "💰", score_submitted: "📊", general: "📢" };
+                const ago = getTimeAgo(n.created_at);
+                return (
+                  <div key={n.id} style={{ padding: "10px 14px", borderBottom: "1px solid #1E2235", background: n.read ? "transparent" : "#1a1c2a", cursor: "default" }}>
+                    <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                      <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>{typeEmoji[n.type] || "📢"}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: n.read ? C.muted : C.fg, lineHeight: 1.3 }}>{n.subject}</div>
+                        <div style={{ fontSize: 11, color: C.dim, marginTop: 2, lineHeight: 1.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{n.body}</div>
+                        <div style={{ fontSize: 10, color: C.dim, marginTop: 3 }}>{ago}</div>
+                      </div>
+                      {!n.read && <span style={{ width: 8, height: 8, borderRadius: 4, background: C.orange, flexShrink: 0, marginTop: 4 }} />}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+
       <div style={{ display: "flex", borderBottom: "1px solid #1E2235", flexShrink: 0, overflowX: "auto" }}>
         {tabs.map(t => (
           <button key={t.v} onClick={() => setTab(t.v)} style={{
