@@ -291,6 +291,15 @@ function Dashboard() {
     } catch (err: any) { toast.error(err.message || "Failed to reject"); }
   };
 
+  const deleteRegistration = async (regId: string) => {
+    try {
+      const { error } = await (supabase as any).from("venue_registrations").delete().eq("id", regId);
+      if (error) throw error;
+      toast.success("Registration removed");
+      qc.invalidateQueries({ queryKey: ["sa-registrations"] });
+    } catch (err: any) { toast.error(err.message || "Failed to delete registration"); }
+  };
+
   const [venueToDelete, setVenueToDelete] = useState<Venue | null>(null);
 
   const deleteVenue = async (venue: Venue) => {
@@ -419,7 +428,7 @@ function Dashboard() {
               <>
                 <div style={{ fontSize: 13, fontWeight: 700, color: C.orange, marginBottom: 8 }}>⚠️ Pending Approvals</div>
                 {pendingRegs.slice(0, 3).map(r => (
-                  <RegistrationCard key={r.id} r={r} onApprove={() => approveRegistration(r)} onReject={() => rejectRegistration(r.id)} />
+                  <RegistrationCard key={r.id} r={r} onApprove={() => approveRegistration(r)} onReject={() => rejectRegistration(r.id)} onDelete={() => deleteRegistration(r.id)} />
                 ))}
                 {pendingRegs.length > 3 && (
                   <button onClick={() => setTab("registrations")} style={{ width: "100%", background: "none", border: `1px dashed ${C.orange}40`, color: C.orange, padding: "8px 0", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>View all {pendingRegs.length} pending →</button>
@@ -451,7 +460,7 @@ function Dashboard() {
                 <div style={{ fontSize: 14, color: C.muted }}>No registrations yet</div>
               </div>
             ) : registrations.map(r => (
-              <RegistrationCard key={r.id} r={r} onApprove={() => approveRegistration(r)} onReject={() => rejectRegistration(r.id)} />
+              <RegistrationCard key={r.id} r={r} onApprove={() => approveRegistration(r)} onReject={() => rejectRegistration(r.id)} onDelete={() => deleteRegistration(r.id)} />
             ))}
           </>
         )}
