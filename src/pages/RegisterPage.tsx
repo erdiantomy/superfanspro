@@ -186,16 +186,16 @@ export default function RegisterPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#fff", color: "#111" }}>
       {/* Header */}
-      <div style={{ borderBottom: "1px solid #eee", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 22, fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif" }}>SUPERFANS</span>
-          <span style={{ fontSize: 11, color: "#999", letterSpacing: 1 }}>VENUE REGISTRATION</span>
+      <div style={{ borderBottom: "1px solid #eee", padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 18, fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif" }}>SUPERFANS</span>
+          <span style={{ fontSize: 10, color: "#999", letterSpacing: 1 }}>VENUE REGISTRATION</span>
         </div>
         <button onClick={() => navigate("/")} style={{ fontSize: 13, color: "#666", background: "none", border: "none", cursor: "pointer" }}>← Back</button>
       </div>
 
       {/* Progress Bar */}
-      <div style={{ padding: "24px 24px 0", maxWidth: 560, margin: "0 auto" }}>
+      <div style={{ padding: "20px 16px 0", maxWidth: 560, margin: "0 auto" }}>
         <div style={{ display: "flex", gap: 4, marginBottom: 8 }}>
           {STEPS.map((_, i) => (
             <div key={i} style={{ flex: 1, height: 4, borderRadius: 2, background: i <= step ? "#111" : "#e5e5e5", transition: "background .3s" }} />
@@ -208,7 +208,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Form Content */}
-      <div style={{ maxWidth: 560, margin: "0 auto", padding: "0 24px 100px" }}>
+      <div style={{ maxWidth: 560, margin: "0 auto", padding: "0 16px 120px" }}>
         <AnimatePresence mode="wait">
           <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }}>
 
@@ -390,10 +390,11 @@ const labelStyle: React.CSSProperties = {
 };
 
 const inputStyle: React.CSSProperties = {
-  width: "100%", padding: "10px 14px", borderRadius: 10,
-  border: "1px solid #ddd", fontSize: 14, outline: "none",
+  width: "100%", padding: "12px 14px", borderRadius: 10,
+  border: "1px solid #ddd", fontSize: 16, outline: "none",
   background: "#fafafa", transition: "border .2s",
   boxSizing: "border-box",
+  WebkitAppearance: "none",
 };
 
 const errorStyle: React.CSSProperties = {
@@ -401,7 +402,8 @@ const errorStyle: React.CSSProperties = {
 };
 
 const navBtn: React.CSSProperties = {
-  display: "flex", alignItems: "center", gap: 6,
-  padding: "10px 20px", borderRadius: 10, fontSize: 14, fontWeight: 600,
+  display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+  padding: "12px 20px", borderRadius: 10, fontSize: 14, fontWeight: 600,
   border: "1px solid #ddd", background: "#fff", color: "#333", cursor: "pointer",
+  flex: 1, maxWidth: 180,
 };
