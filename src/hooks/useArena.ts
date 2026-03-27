@@ -192,6 +192,7 @@ export function useCreateSession() {
     mutationFn: async (session: {
       name: string; format: string; partner_type: string;
       courts: number; status: string; host_id: string;
+      venue_id?: string | null;
       max_players: number; locked: boolean;
       scheduled_at: string; admin_note: null; approved_at: null;
     }) => {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useVenue } from "@/hooks/useVenue";
 import { usePadelPlayer, useCreateSession, useSessions, ensurePadelPlayer } from "@/hooks/useArena";
 import { Tag, StatusTag, C, fmtLabel, shareUrl } from "@/components/arena";
 import { toast } from "sonner";
@@ -9,6 +10,7 @@ import logo from "@/assets/superfans-logo.png";
 export default function HostDashboard() {
   const navigate          = useNavigate();
   const { user }          = useAuth();
+  const { venue }         = useVenue();
   const { data: me, isLoading: meLoading, refetch: refetchMe } = usePadelPlayer(user?.id);
   const { data: allSessions = [] } = useSessions();
   const [view, setView]   = useState<"list" | "create">("list");
@@ -51,7 +53,7 @@ export default function HostDashboard() {
     );
   }
 
-  if (view === "create") return <CreateSessionForm onDone={() => setView("list")} hostId={me?.id ?? ""} />;
+  if (view === "create") return <CreateSessionForm onDone={() => setView("list")} hostId={me?.id ?? ""} venueId={venue?.id} />;
 
   return (
     <div style={{ height:"100dvh", background:C.bg, color:C.fg, maxWidth:480, margin:"0 auto", display:"flex", flexDirection:"column", overflow:"hidden", fontFamily:"'DM Sans',sans-serif" }}>
@@ -118,7 +120,7 @@ export default function HostDashboard() {
 }
 
 // ─── CREATE SESSION FORM ──────────────────────────────
-function CreateSessionForm({ onDone, hostId }: { onDone: () => void; hostId: string }) {
+function CreateSessionForm({ onDone, hostId, venueId }: { onDone: () => void; hostId: string; venueId?: string }) {
   const [step,   setStep]   = useState(1);
   const [fmt,    setFmt]    = useState<"americano"|"mexicano"|null>(null);
   const [pt,     setPt]     = useState<"random"|"fixed"|null>(null);
@@ -143,6 +145,7 @@ function CreateSessionForm({ onDone, hostId }: { onDone: () => void; hostId: str
         courts,
         status:       "pending_approval",
         host_id:      hostId,
+        venue_id:     venueId || null,
         max_players:  courts * 4,
         locked:       false,
         scheduled_at: new Date(`${date}T${time}`).toISOString(),
