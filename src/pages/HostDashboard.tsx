@@ -120,7 +120,7 @@ export default function HostDashboard() {
 }
 
 // ─── CREATE SESSION FORM ──────────────────────────────
-function CreateSessionForm({ onDone, hostId }: { onDone: () => void; hostId: string }) {
+function CreateSessionForm({ onDone, hostId, venueId }: { onDone: () => void; hostId: string; venueId?: string }) {
   const [step,   setStep]   = useState(1);
   const [fmt,    setFmt]    = useState<"americano"|"mexicano"|null>(null);
   const [pt,     setPt]     = useState<"random"|"fixed"|null>(null);
