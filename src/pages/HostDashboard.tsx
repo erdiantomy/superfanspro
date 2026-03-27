@@ -30,16 +30,7 @@ export default function HostDashboard() {
   const myOwnSessions = allSessions.filter(s => me && s.host_id === me.id);
 
   if (!user) {
-    return (
-      <div style={{ height:"100dvh", background:C.bg, color:C.fg, maxWidth:480, margin:"0 auto", display:"flex", alignItems:"center", justifyContent:"center", padding:24, fontFamily:"'DM Sans',sans-serif", textAlign:"center" }}>
-        <div>
-          <div style={{ fontSize:36, marginBottom:12 }}>🔐</div>
-          <div className="font-display" style={{ fontSize:20, fontWeight:900, marginBottom:8 }}>Sign in required</div>
-          <div style={{ fontSize:12, color:C.muted, marginBottom:20 }}>You need to be signed in to host sessions</div>
-          <button onClick={() => navigate("/auth")} style={{ background:C.green, border:"none", color:"#0A0C11", padding:"12px 24px", borderRadius:12, fontFamily:"'Barlow Condensed'", fontSize:16, fontWeight:800, cursor:"pointer" }}>SIGN IN →</button>
-        </div>
-      </div>
-    );
+    return <HostSignIn />;
   }
 
   if (meLoading || ensuring) {
