@@ -291,12 +291,15 @@ function Dashboard() {
     } catch (err: any) { toast.error(err.message || "Failed to reject"); }
   };
 
+  const [regToDelete, setRegToDelete] = useState<Registration | null>(null);
+
   const deleteRegistration = async (regId: string) => {
     try {
       const { error } = await (supabase as any).from("venue_registrations").delete().eq("id", regId);
       if (error) throw error;
       toast.success("Registration removed");
       qc.invalidateQueries({ queryKey: ["sa-registrations"] });
+      setRegToDelete(null);
     } catch (err: any) { toast.error(err.message || "Failed to delete registration"); }
   };
 
