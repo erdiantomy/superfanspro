@@ -290,10 +290,20 @@ function Dashboard() {
     try {
       const { error } = await (supabase as any).from("venues").delete().eq("id", venue.id);
       if (error) throw error;
-      toast.success(`${venue.name} removed successfully`);
+      toast.success(`${venue.name} removed permanently`);
       qc.invalidateQueries({ queryKey: ["sa-venues"] });
       setVenueToDelete(null);
     } catch (err: any) { toast.error(err.message || "Failed to delete venue"); }
+  };
+
+  const toggleVenueStatus = async (venue: Venue) => {
+    const newStatus = venue.status === "active" ? "suspended" : "active";
+    try {
+      const { error } = await (supabase as any).from("venues").update({ status: newStatus }).eq("id", venue.id);
+      if (error) throw error;
+      toast.success(`${venue.name} ${newStatus === "suspended" ? "suspended" : "reactivated"}!`);
+      qc.invalidateQueries({ queryKey: ["sa-venues"] });
+    } catch (err: any) { toast.error(err.message || "Failed to update venue status"); }
   };
 
   const fmtDate = (d: string) => new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
