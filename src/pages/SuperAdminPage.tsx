@@ -109,6 +109,18 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+/* ── Time ago helper ────────────────────────────────── */
+function getTimeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return days === 1 ? "1d ago" : `${days}d ago`;
+}
+
 /* ── Shared styles ──────────────────────────────────── */
 const inputStyle: React.CSSProperties = {
   width: "100%", background: "#14161E", border: "1px solid #1E2235",
