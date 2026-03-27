@@ -284,6 +284,18 @@ function Dashboard() {
     } catch (err: any) { toast.error(err.message || "Failed to reject"); }
   };
 
+  const [venueToDelete, setVenueToDelete] = useState<Venue | null>(null);
+
+  const deleteVenue = async (venue: Venue) => {
+    try {
+      const { error } = await (supabase as any).from("venues").delete().eq("id", venue.id);
+      if (error) throw error;
+      toast.success(`${venue.name} removed successfully`);
+      qc.invalidateQueries({ queryKey: ["sa-venues"] });
+      setVenueToDelete(null);
+    } catch (err: any) { toast.error(err.message || "Failed to delete venue"); }
+  };
+
   const fmtDate = (d: string) => new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
 
   const tabs: { v: TabKey; l: string; n?: number }[] = [
@@ -432,20 +444,45 @@ function Dashboard() {
           <>
             <div style={{ fontSize: 11, color: C.muted, marginBottom: 12 }}>{venues.length} venues registered on the platform.</div>
             {venues.map(v => (
-              <div key={v.id} onClick={() => navigate(`/${v.slug}`)} style={{ background: "#14161E", border: "1px solid #1E2235", borderRadius: 14, padding: "12px 14px", marginBottom: 8, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ width: 12, height: 12, borderRadius: 3, background: v.primary_color || "#00E676", flexShrink: 0 }} />
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 700 }}>{v.name}</div>
-                    <div style={{ fontSize: 11, color: C.muted }}>/{v.slug} · {v.city || "—"} · {v.courts_default || "?"} courts</div>
+              <div key={v.id} style={{ background: "#14161E", border: "1px solid #1E2235", borderRadius: 14, padding: "12px 14px", marginBottom: 8 }}>
+                <div onClick={() => navigate(`/${v.slug}`)} style={{ cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ width: 12, height: 12, borderRadius: 3, background: v.primary_color || "#00E676", flexShrink: 0 }} />
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 700 }}>{v.name}</div>
+                      <div style={{ fontSize: 11, color: C.muted }}>/{v.slug} · {v.city || "—"} · {v.courts_default || "?"} courts</div>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <Tag label={v.status.toUpperCase()} color={v.status === "active" ? C.green : v.status === "suspended" ? C.red : C.orange} />
+                    <div style={{ fontSize: 10, color: C.dim, marginTop: 4 }}>{fmtDate(v.created_at)}</div>
                   </div>
                 </div>
-                <div style={{ textAlign: "right" }}>
-                  <Tag label={v.status.toUpperCase()} color={v.status === "active" ? C.green : v.status === "suspended" ? C.red : C.orange} />
-                  <div style={{ fontSize: 10, color: C.dim, marginTop: 4 }}>{fmtDate(v.created_at)}</div>
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8, paddingTop: 8, borderTop: "1px solid #1E2235" }}>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setVenueToDelete(v); }}
+                    style={{ background: `${C.red}15`, border: `1px solid ${C.red}35`, color: C.red, padding: "6px 14px", borderRadius: 8, fontFamily: "'Barlow Condensed'", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+                  >🗑 Remove Venue</button>
                 </div>
               </div>
             ))}
+
+            {/* Delete confirmation modal */}
+            {venueToDelete && (
+              <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }} onClick={() => setVenueToDelete(null)}>
+                <div onClick={e => e.stopPropagation()} style={{ background: "#14161E", border: "1px solid #1E2235", borderRadius: 16, padding: 24, maxWidth: 360, width: "100%" }}>
+                  <div style={{ fontSize: 32, textAlign: "center", marginBottom: 8 }}>⚠️</div>
+                  <div className="font-display" style={{ fontSize: 18, fontWeight: 900, textAlign: "center", color: C.red, marginBottom: 8 }}>REMOVE VENUE</div>
+                  <div style={{ fontSize: 13, color: C.muted, textAlign: "center", marginBottom: 16, lineHeight: 1.6 }}>
+                    Are you sure you want to permanently remove <strong style={{ color: C.fg }}>{venueToDelete.name}</strong> (/{venueToDelete.slug})? This action cannot be undone.
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button onClick={() => setVenueToDelete(null)} style={{ flex: 1, background: "#1E2235", border: "none", color: C.muted, padding: "11px 0", borderRadius: 10, fontFamily: "'Barlow Condensed'", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+                    <button onClick={() => deleteVenue(venueToDelete)} style={{ flex: 1, background: C.red, border: "none", color: "#fff", padding: "11px 0", borderRadius: 10, fontFamily: "'Barlow Condensed'", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>Yes, Remove</button>
+                  </div>
+                </div>
+              </div>
+            )}
           </>
         )}
 
