@@ -145,6 +145,7 @@ function CreateSessionForm({ onDone, hostId, venueId }: { onDone: () => void; ho
         courts,
         status:       "pending_approval",
         host_id:      hostId,
+        venue_id:     venueId || null,
         max_players:  courts * 4,
         locked:       false,
         scheduled_at: new Date(`${date}T${time}`).toISOString(),
