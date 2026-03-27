@@ -103,7 +103,7 @@ export default function RegisterPage() {
       if (!form.venue_name.trim()) e.venue_name = "Venue name is required";
       if (!form.slug || form.slug.length < 3) e.slug = "Slug must be at least 3 characters";
       if (slugStatus === "taken") e.slug = "This slug is already taken";
-      if (form.courts < 1 || form.courts > 10) e.courts = "Must be 1-10";
+      if (form.courts < 1) e.courts = "Must be at least 1";
     }
 
     if (step === 2) {
@@ -255,7 +255,7 @@ export default function RegisterPage() {
                 </div>
                 <div style={{ marginBottom: 20 }}>
                   <label style={labelStyle}>Number of Courts</label>
-                  <input type="number" min={1} max={10} value={form.courts} onChange={e => set("courts", parseInt(e.target.value) || 1)} style={inputStyle} />
+                  <input type="number" min={1} value={form.courts} onChange={e => set("courts", parseInt(e.target.value) || 1)} style={inputStyle} />
                   {errors.courts && <div style={errorStyle}>{errors.courts}</div>}
                 </div>
                 <div style={{ marginBottom: 20 }}>
