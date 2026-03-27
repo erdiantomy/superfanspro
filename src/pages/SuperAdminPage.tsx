@@ -291,12 +291,15 @@ function Dashboard() {
     } catch (err: any) { toast.error(err.message || "Failed to reject"); }
   };
 
+  const [regToDelete, setRegToDelete] = useState<Registration | null>(null);
+
   const deleteRegistration = async (regId: string) => {
     try {
       const { error } = await (supabase as any).from("venue_registrations").delete().eq("id", regId);
       if (error) throw error;
       toast.success("Registration removed");
       qc.invalidateQueries({ queryKey: ["sa-registrations"] });
+      setRegToDelete(null);
     } catch (err: any) { toast.error(err.message || "Failed to delete registration"); }
   };
 
@@ -428,7 +431,7 @@ function Dashboard() {
               <>
                 <div style={{ fontSize: 13, fontWeight: 700, color: C.orange, marginBottom: 8 }}>⚠️ Pending Approvals</div>
                 {pendingRegs.slice(0, 3).map(r => (
-                  <RegistrationCard key={r.id} r={r} onApprove={() => approveRegistration(r)} onReject={() => rejectRegistration(r.id)} onDelete={() => deleteRegistration(r.id)} />
+                  <RegistrationCard key={r.id} r={r} onApprove={() => approveRegistration(r)} onReject={() => rejectRegistration(r.id)} onDelete={() => setRegToDelete(r)} />
                 ))}
                 {pendingRegs.length > 3 && (
                   <button onClick={() => setTab("registrations")} style={{ width: "100%", background: "none", border: `1px dashed ${C.orange}40`, color: C.orange, padding: "8px 0", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>View all {pendingRegs.length} pending →</button>
@@ -460,8 +463,25 @@ function Dashboard() {
                 <div style={{ fontSize: 14, color: C.muted }}>No registrations yet</div>
               </div>
             ) : registrations.map(r => (
-              <RegistrationCard key={r.id} r={r} onApprove={() => approveRegistration(r)} onReject={() => rejectRegistration(r.id)} onDelete={() => deleteRegistration(r.id)} />
+              <RegistrationCard key={r.id} r={r} onApprove={() => approveRegistration(r)} onReject={() => rejectRegistration(r.id)} onDelete={() => setRegToDelete(r)} />
             ))}
+
+            {/* Registration delete confirmation modal */}
+            {regToDelete && (
+              <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }} onClick={() => setRegToDelete(null)}>
+                <div onClick={e => e.stopPropagation()} style={{ background: "#14161E", border: "1px solid #1E2235", borderRadius: 16, padding: 24, maxWidth: 360, width: "100%" }}>
+                  <div style={{ fontSize: 32, textAlign: "center", marginBottom: 8 }}>🗑️</div>
+                  <div className="font-display" style={{ fontSize: 18, fontWeight: 900, textAlign: "center", color: C.red, marginBottom: 8 }}>REMOVE REGISTRATION</div>
+                  <div style={{ fontSize: 13, color: C.muted, textAlign: "center", marginBottom: 16, lineHeight: 1.6 }}>
+                    Remove the registration for <strong style={{ color: C.fg }}>{regToDelete.venue_name}</strong> ({regToDelete.status})? This cannot be undone.
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button onClick={() => setRegToDelete(null)} style={{ flex: 1, background: "#1E2235", border: "none", color: C.muted, padding: "11px 0", borderRadius: 10, fontFamily: "'Barlow Condensed'", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>Cancel</button>
+                    <button onClick={() => deleteRegistration(regToDelete.id)} style={{ flex: 1, background: C.red, border: "none", color: "#fff", padding: "11px 0", borderRadius: 10, fontFamily: "'Barlow Condensed'", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>Yes, Remove</button>
+                  </div>
+                </div>
+              </div>
+            )}
           </>
         )}
 
