@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { startOfMonth, endOfMonth, subMonths, isWithinInterval, format, parseISO } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -420,62 +421,135 @@ function Dashboard() {
         )}
 
         {/* ── REVENUE ────────────────────────────── */}
-        {tab === "revenue" && (() => {
-          const totalPool = matches.reduce((sum, m) => sum + (m.pool || 0), 0);
-          const platformFees = Math.round(totalPool * 0.1);
-          const totalMatches = matches.length;
-
-          // Group by venue (match title typically contains venue info)
-          const venuePoolMap: Record<string, { pool: number; matches: number; fans: number }> = {};
-          for (const m of matches) {
-            const key = m.title || "Unknown";
-            if (!venuePoolMap[key]) venuePoolMap[key] = { pool: 0, matches: 0, fans: 0 };
-            venuePoolMap[key].pool += m.pool || 0;
-            venuePoolMap[key].matches += 1;
-            venuePoolMap[key].fans += m.fans || 0;
-          }
-          const venueRevenue = Object.entries(venuePoolMap)
-            .map(([name, d]) => ({ name, ...d, avgPool: d.matches > 0 ? Math.round(d.pool / d.matches) : 0 }))
-            .sort((a, b) => b.pool - a.pool);
-
-          return (
-            <>
-              <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
-                <StatCard icon="💰" label="Total Pools" value={`Rp ${totalPool.toLocaleString("id-ID")}`} color={C.green} />
-                <StatCard icon="🏦" label="Platform Fees (10%)" value={`Rp ${platformFees.toLocaleString("id-ID")}`} color={C.gold} />
-              </div>
-              <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
-                <StatCard icon="🎾" label="Total Matches" value={totalMatches} color={C.blue} />
-                <StatCard icon="👥" label="Total Fans" value={matches.reduce((s, m) => s + (m.fans || 0), 0)} color={C.purple} />
-              </div>
-
-              <div style={{ fontSize: 13, fontWeight: 700, color: C.fg, marginBottom: 8 }}>📊 Revenue by Venue / Event</div>
-              {venueRevenue.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "32px 0", color: C.muted }}>No match data yet</div>
-              ) : venueRevenue.map((v, i) => (
-                <div key={i} style={{ background: "#14161E", border: "1px solid #1E2235", borderRadius: 14, padding: "12px 14px", marginBottom: 8 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700 }}>{v.name}</div>
-                    <div className="font-display" style={{ fontSize: 16, fontWeight: 900, color: C.green }}>Rp {v.pool.toLocaleString("id-ID")}</div>
-                  </div>
-                  <div style={{ display: "flex", gap: 16, fontSize: 11, color: C.muted }}>
-                    <span>🎾 {v.matches} matches</span>
-                    <span>👥 {v.fans} fans</span>
-                    <span>📊 Avg: Rp {v.avgPool.toLocaleString("id-ID")}</span>
-                  </div>
-                  <div style={{ fontSize: 10, color: C.dim, marginTop: 4 }}>
-                    Platform fee: <span style={{ color: C.gold }}>Rp {Math.round(v.pool * 0.1).toLocaleString("id-ID")}</span>
-                  </div>
-                </div>
-              ))}
-            </>
-          );
-        })()}
+        {tab === "revenue" && <RevenueTab matches={matches} />}
       </div>
     </div>
   );
 }
 
+/* ── Revenue Tab Component ────────────────────────── */
+type DatePreset = "all" | "this_month" | "last_month" | "custom";
+
+function RevenueTab({ matches }: { matches: MatchRow[] }) {
+  const [preset, setPreset] = useState<DatePreset>("all");
+  const [customFrom, setCustomFrom] = useState("");
+  const [customTo, setCustomTo] = useState("");
+
+  const now = new Date();
+  const filteredMatches = useMemo(() => {
+    if (preset === "all") return matches;
+    let start: Date, end: Date;
+    if (preset === "this_month") {
+      start = startOfMonth(now);
+      end = endOfMonth(now);
+    } else if (preset === "last_month") {
+      const prev = subMonths(now, 1);
+      start = startOfMonth(prev);
+      end = endOfMonth(prev);
+    } else {
+      if (!customFrom || !customTo) return matches;
+      start = parseISO(customFrom);
+      end = parseISO(customTo);
+      end.setHours(23, 59, 59, 999);
+    }
+    return matches.filter(m => {
+      const d = new Date(m.created_at);
+      return isWithinInterval(d, { start, end });
+    });
+  }, [matches, preset, customFrom, customTo]);
+
+  const totalPool = filteredMatches.reduce((sum, m) => sum + (m.pool || 0), 0);
+  const platformFees = Math.round(totalPool * 0.1);
+
+  const venuePoolMap: Record<string, { pool: number; matches: number; fans: number }> = {};
+  for (const m of filteredMatches) {
+    const key = m.title || "Unknown";
+    if (!venuePoolMap[key]) venuePoolMap[key] = { pool: 0, matches: 0, fans: 0 };
+    venuePoolMap[key].pool += m.pool || 0;
+    venuePoolMap[key].matches += 1;
+    venuePoolMap[key].fans += m.fans || 0;
+  }
+  const venueRevenue = Object.entries(venuePoolMap)
+    .map(([name, d]) => ({ name, ...d, avgPool: d.matches > 0 ? Math.round(d.pool / d.matches) : 0 }))
+    .sort((a, b) => b.pool - a.pool);
+
+  const presetBtns: { v: DatePreset; l: string }[] = [
+    { v: "all", l: "All Time" },
+    { v: "this_month", l: "This Month" },
+    { v: "last_month", l: "Last Month" },
+    { v: "custom", l: "Custom" },
+  ];
+
+  const rangeLabel = preset === "all" ? "All Time"
+    : preset === "this_month" ? format(startOfMonth(now), "MMM yyyy")
+    : preset === "last_month" ? format(startOfMonth(subMonths(now, 1)), "MMM yyyy")
+    : customFrom && customTo ? `${format(parseISO(customFrom), "dd MMM")} – ${format(parseISO(customTo), "dd MMM yyyy")}` : "Select dates";
+
+  return (
+    <>
+      {/* Date filter */}
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
+          {presetBtns.map(p => (
+            <button key={p.v} onClick={() => setPreset(p.v)} style={{
+              padding: "6px 12px", borderRadius: 8, border: `1px solid ${preset === p.v ? C.orange : "#1E2235"}`,
+              background: preset === p.v ? C.orange + "18" : "#14161E",
+              color: preset === p.v ? C.orange : C.muted, fontSize: 11, fontWeight: 700,
+              fontFamily: "'Barlow Condensed'", cursor: "pointer",
+            }}>
+              {p.l}
+            </button>
+          ))}
+        </div>
+        {preset === "custom" && (
+          <div style={{ display: "flex", gap: 8, marginBottom: 4 }}>
+            <input type="date" value={customFrom} onChange={e => setCustomFrom(e.target.value)}
+              style={{ ...dateInputStyle }} />
+            <span style={{ color: C.muted, fontSize: 12, alignSelf: "center" }}>→</span>
+            <input type="date" value={customTo} onChange={e => setCustomTo(e.target.value)}
+              style={{ ...dateInputStyle }} />
+          </div>
+        )}
+        <div style={{ fontSize: 10, color: C.dim, marginTop: 2 }}>📅 Showing: {rangeLabel} · {filteredMatches.length} matches</div>
+      </div>
+
+      <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+        <StatCard icon="💰" label="Total Pools" value={`Rp ${totalPool.toLocaleString("id-ID")}`} color={C.green} />
+        <StatCard icon="🏦" label="Platform Fees (10%)" value={`Rp ${platformFees.toLocaleString("id-ID")}`} color={C.gold} />
+      </div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+        <StatCard icon="🎾" label="Total Matches" value={filteredMatches.length} color={C.blue} />
+        <StatCard icon="👥" label="Total Fans" value={filteredMatches.reduce((s, m) => s + (m.fans || 0), 0)} color={C.purple} />
+      </div>
+
+      <div style={{ fontSize: 13, fontWeight: 700, color: C.fg, marginBottom: 8 }}>📊 Revenue by Venue / Event</div>
+      {venueRevenue.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "32px 0", color: C.muted }}>No match data in this period</div>
+      ) : venueRevenue.map((v, i) => (
+        <div key={i} style={{ background: "#14161E", border: "1px solid #1E2235", borderRadius: 14, padding: "12px 14px", marginBottom: 8 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+            <div style={{ fontSize: 14, fontWeight: 700 }}>{v.name}</div>
+            <div className="font-display" style={{ fontSize: 16, fontWeight: 900, color: C.green }}>Rp {v.pool.toLocaleString("id-ID")}</div>
+          </div>
+          <div style={{ display: "flex", gap: 16, fontSize: 11, color: C.muted }}>
+            <span>🎾 {v.matches} matches</span>
+            <span>👥 {v.fans} fans</span>
+            <span>📊 Avg: Rp {v.avgPool.toLocaleString("id-ID")}</span>
+          </div>
+          <div style={{ fontSize: 10, color: C.dim, marginTop: 4 }}>
+            Platform fee: <span style={{ color: C.gold }}>Rp {Math.round(v.pool * 0.1).toLocaleString("id-ID")}</span>
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
+const dateInputStyle: React.CSSProperties = {
+  flex: 1, background: "#14161E", border: "1px solid #1E2235",
+  borderRadius: 8, padding: "8px 10px", color: "#E8ECF4", fontSize: 12,
+  outline: "none", colorScheme: "dark",
+};
 const headerBtnStyle: React.CSSProperties = {
   background: "#14161E", border: "1px solid #1E2235", color: C.muted,
   padding: "5px 10px", borderRadius: 8, fontFamily: "'Barlow Condensed'",
