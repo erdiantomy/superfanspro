@@ -4,7 +4,11 @@ import { useProfile } from "@/hooks/useData";
 import { Avatar, SectionHead } from "./UIElements";
 import { container, item } from "./MotionVariants";
 
-export default function ProfileScreen() {
+interface ProfileProps {
+  onNotifications?: () => void;
+}
+
+export default function ProfileScreen({ onNotifications }: ProfileProps) {
   const { user, signOut } = useAuth();
   const { data: profile } = useProfile(user?.id);
 
@@ -76,7 +80,12 @@ export default function ProfileScreen() {
 
       {/* Menu */}
       {["Edit Profile", "Referral Code", "Notifications", "Help Center"].map(menuItem => (
-        <motion.div key={menuItem} variants={item} className="flex items-center justify-between py-3.5 border-b border-border cursor-pointer">
+        <motion.div
+          key={menuItem}
+          variants={item}
+          className="flex items-center justify-between py-3.5 border-b border-border cursor-pointer"
+          onClick={menuItem === "Notifications" ? onNotifications : undefined}
+        >
           <span className="text-[14px] font-medium">{menuItem}</span>
           <span className="text-muted-foreground">›</span>
         </motion.div>

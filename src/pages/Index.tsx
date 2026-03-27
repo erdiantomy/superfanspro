@@ -11,11 +11,13 @@ import MatchResultScreen from "@/components/fanprize/MatchResultScreen";
 import WalletScreen from "@/components/fanprize/WalletScreen";
 import StoreScreen from "@/components/fanprize/StoreScreen";
 import ProfileScreen from "@/components/fanprize/ProfileScreen";
+import NotificationsScreen from "@/components/fanprize/NotificationsScreen";
+import NotificationPreferences from "@/components/fanprize/NotificationPreferences";
 import AdminPanel from "@/pages/AdminPanel";
 import BottomNav from "@/components/fanprize/BottomNav";
 import SupportModal from "@/components/fanprize/SupportModal";
 
-type Screen = "home" | "matchDetail" | "matchResult" | "wallet" | "store" | "profile" | "admin";
+type Screen = "home" | "matchDetail" | "matchResult" | "wallet" | "store" | "profile" | "admin" | "notifications" | "notificationPrefs";
 
 const NAV_ORDER: Record<string, number> = { home: 0, matches: 0, wallet: 1, store: 2, profile: 3, admin: 4 };
 
@@ -106,14 +108,17 @@ const Index = () => {
         />
       );
     }
+    if (screen === "notifications") return <NotificationsScreen key="notifications" onBack={() => { setScreen("profile"); setNav("profile"); }} onPreferences={() => setScreen("notificationPrefs")} />;
+    if (screen === "notificationPrefs") return <NotificationPreferences key="notificationPrefs" onBack={() => setScreen("notifications")} />;
     if (screen === "admin") return <AdminPanel key="admin" onBack={() => { setScreen("home"); setNav("home"); }} />;
     if (screen === "wallet") return <WalletScreen key="wallet" />;
     if (screen === "store") return <StoreScreen key="store" />;
-    if (screen === "profile") return <ProfileScreen key="profile" />;
+    if (screen === "profile") return <ProfileScreen key="profile" onNotifications={() => setScreen("notifications")} />;
     return (
       <HomeScreen
         key="home"
         onPick={m => { setMatch(m); setScreen(m.status === "finished" ? "matchResult" : "matchDetail"); }}
+        onNotifications={() => setScreen("notifications")}
       />
     );
   };
