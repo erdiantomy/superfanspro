@@ -151,14 +151,21 @@ export default function AdminPage() {
 
   // ─── Password Gate ────────────────────────────────────
   if (!authed) {
-    const checkPassword = () => {
-      // For tomspadel, use the existing hardcoded password
-      // For other venues, check against admin_password_hash in venues table
-      const correctPass = slug === "tomspadel" ? "sirapadel7B" : (venue as any).admin_password_hash;
-      if (pass === correctPass) {
-        setAuthed(true);
-      } else {
-        alert("Incorrect password");
+    const checkPassword = async () => {
+      try {
+        const { data, error } = await supabase.rpc("verify_venue_password", {
+          venue_slug: slug!,
+          plain_password: pass,
+        });
+        if (error) throw error;
+        if (data) {
+          setAuthed(true);
+        } else {
+          alert("Incorrect password");
+          setPass("");
+        }
+      } catch {
+        alert("Error verifying password");
         setPass("");
       }
     };
