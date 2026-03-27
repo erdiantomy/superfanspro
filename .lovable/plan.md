@@ -1,13 +1,33 @@
 
 
-## Assign Admin Role to Your Account
+## Add Email Notification for New Venue Registrations
 
-**What**: Insert a row into the `user_roles` table granting the `admin` role to your account (`erdian.tomy@gmail.com`, user ID `5da3f7d8-e292-46b3-9511-3d4ecbb41a00`).
+When a new venue submits a registration at `/register`, you'll receive an email at `erdian.tomy@gmail.com` with the venue details so you never miss a pending approval.
 
-**How**: Single SQL INSERT into `user_roles`:
-```sql
-INSERT INTO user_roles (user_id, role) VALUES ('5da3f7d8-e292-46b3-9511-3d4ecbb41a00', 'admin');
-```
+### What will be built
 
-**Result**: You'll be able to log in at `/superadmin` with your email and password, and the `has_role()` function will return `true` for your account, granting full access to the Super Admin dashboard including venue registration approvals, match management, and user oversight.
+1. **Email infrastructure setup** — Set up the email queue, tables, and processing pipeline using the verified `notify.nosecret.co` domain.
+
+2. **Scaffold transactional email system** — Create the `send-transactional-email` Edge Function and supporting infrastructure (unsubscribe handling, suppression).
+
+3. **Create "New Registration" email template** — A branded React Email template showing:
+   - Venue name, slug, city, country
+   - Contact name, email, phone
+   - Court count, monthly prize amount
+   - A CTA button linking to `/superadmin`
+
+4. **Wire up the trigger** — After a successful venue registration insert in `RegisterPage.tsx`, invoke `send-transactional-email` to send the notification to your admin email.
+
+5. **Create unsubscribe page** — Required by the transactional email system (standard compliance page).
+
+6. **Deploy Edge Functions** — Deploy `send-transactional-email` and related functions.
+
+### Technical details
+
+- **Sender**: `noreply@nosecret.co` (via verified `notify.nosecret.co`)
+- **Recipient**: `erdian.tomy@gmail.com` (hardcoded as admin email)
+- **Template**: `new-venue-registration` in `_shared/transactional-email-templates/`
+- **Trigger point**: `RegisterPage.tsx` `submit()` function, after successful insert
+- **Idempotency key**: `venue-reg-${registrationId}` to prevent duplicates
+- **Styling**: Dark theme matching SuperFans branding (green accent `#00E676`, dark background cards) with white email body background per email standards
 
