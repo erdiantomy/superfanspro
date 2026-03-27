@@ -2,14 +2,17 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useAdmin";
 import { C, Tag } from "@/components/arena";
 import { toast } from "sonner";
 
-const SUPER_ADMIN_PASS = "superfans2026!";
-
+/* ── Types ──────────────────────────────────────────── */
 interface Venue {
   id: string; slug: string; name: string; city: string | null;
   status: string; created_at: string; primary_color: string | null;
+  courts_default: number | null; monthly_prize: number | null;
+  contact_name: string | null; contact_email: string | null;
 }
 
 interface Registration {
@@ -21,19 +24,135 @@ interface Registration {
   status: string; created_at: string;
 }
 
-export default function SuperAdminPage() {
-  const navigate = useNavigate();
-  const qc = useQueryClient();
-  const [authed, setAuthed] = useState(false);
-  const [pass, setPass] = useState("");
-  const [tab, setTab] = useState<"registrations" | "venues">("registrations");
-  const [rejectId, setRejectId] = useState<string | null>(null);
-  const [rejectReason, setRejectReason] = useState("");
+interface MatchRow {
+  id: string; title: string; status: string;
+  player_a_name: string; player_b_name: string;
+  score_a: number; score_b: number; fans: number; pool: number;
+  created_at: string; starts_at: string | null; winner: string | null;
+}
 
-  // Fetch venues (uses service-level query; super admin bypasses RLS via direct query)
-  const { data: venues = [], isLoading: vLoad } = useQuery({
-    queryKey: ["super-admin-venues"],
-    enabled: authed,
+/* ── Auth Gate Component ────────────────────────────── */
+function AuthGate({ children }: { children: React.ReactNode }) {
+  const { user, loading: authLoading } = useAuth();
+  const { data: isAdmin, isLoading: roleLoading } = useIsAdmin();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  const [signing, setSigning] = useState(false);
+
+  if (authLoading || roleLoading) {
+    return (
+      <div style={{ height: "100dvh", background: "#0A0A0E", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ color: C.muted, fontSize: 14 }}>Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    const handleLogin = async () => {
+      setSigning(true);
+      const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+      if (error) { toast.error(error.message); setSigning(false); }
+    };
+    return (
+      <div style={{ height: "100dvh", background: "#0A0A0E", color: C.fg, maxWidth: 480, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ width: "100%", maxWidth: 360, textAlign: "center" }}>
+          <div style={{ fontSize: 44, marginBottom: 12 }}>🔐</div>
+          <div className="font-display" style={{ fontSize: 26, fontWeight: 900, color: C.orange, letterSpacing: 1 }}>SUPER ADMIN</div>
+          <div style={{ fontSize: 12, color: C.muted, marginTop: 4, marginBottom: 24 }}>Platform-level access · Sign in required</div>
+          <input value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="Email" style={inputStyle} />
+          <input value={pass} onChange={e => setPass(e.target.value)} onKeyDown={e => e.key === "Enter" && handleLogin()} type="password" placeholder="Password" style={{ ...inputStyle, marginTop: 8 }} />
+          <button onClick={handleLogin} disabled={signing} style={{ width: "100%", background: C.orange, border: "none", color: "#0A0C11", padding: "13px 0", borderRadius: 12, fontFamily: "'Barlow Condensed'", fontSize: 16, fontWeight: 800, cursor: "pointer", marginTop: 10, opacity: signing ? 0.6 : 1 }}>
+            {signing ? "Signing in..." : "SIGN IN →"}
+          </button>
+          <button onClick={() => navigate("/")} style={{ width: "100%", background: "none", border: "none", color: C.muted, padding: "8px 0", fontFamily: "'Barlow Condensed'", fontSize: 13, fontWeight: 700, cursor: "pointer", marginTop: 4 }}>← Back</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div style={{ height: "100dvh", background: "#0A0A0E", color: C.fg, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: 44, marginBottom: 12 }}>⛔</div>
+          <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>Access Denied</div>
+          <div style={{ fontSize: 13, color: C.muted, marginBottom: 20 }}>Your account doesn't have super admin privileges.</div>
+          <button onClick={() => navigate("/")} style={{ background: C.orange, border: "none", color: "#0A0C11", padding: "10px 24px", borderRadius: 10, fontFamily: "'Barlow Condensed'", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>← Go Home</button>
+        </div>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}
+
+/* ── Shared styles ──────────────────────────────────── */
+const inputStyle: React.CSSProperties = {
+  width: "100%", background: "#14161E", border: "1px solid #1E2235",
+  borderRadius: 12, padding: "12px 16px", color: "#E8ECF4", fontSize: 14,
+  outline: "none", boxSizing: "border-box",
+};
+
+/* ── Stat Card ──────────────────────────────────────── */
+function StatCard({ icon, label, value, color = C.green }: { icon: string; label: string; value: string | number; color?: string }) {
+  return (
+    <div style={{ background: "#14161E", border: "1px solid #1E2235", borderRadius: 14, padding: "14px 16px", flex: 1, minWidth: 120 }}>
+      <div style={{ fontSize: 20, marginBottom: 4 }}>{icon}</div>
+      <div className="font-display" style={{ fontSize: 24, fontWeight: 900, color, lineHeight: 1.1 }}>{value}</div>
+      <div style={{ fontSize: 10, color: C.muted, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>{label}</div>
+    </div>
+  );
+}
+
+/* ── Registration Card ──────────────────────────────── */
+function RegistrationCard({ r, onApprove, onReject }: { r: Registration; onApprove: () => void; onReject: () => void }) {
+  const isPending = r.status === "pending";
+  const isApproved = r.status === "approved";
+  const isRejected = r.status === "rejected";
+  const fmtDate = (d: string) => new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
+
+  return (
+    <div style={{ background: "#14161E", border: `1px solid ${isPending ? C.orange + "40" : isApproved ? C.green + "30" : C.red + "25"}`, borderRadius: 14, padding: 14, marginBottom: 10 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+        <div>
+          <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 2 }}>{r.venue_name}</div>
+          <div style={{ fontSize: 12, color: C.muted }}>{r.city}, {r.country}</div>
+        </div>
+        <Tag label={r.status.toUpperCase()} color={isPending ? C.orange : isApproved ? C.green : C.red} />
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+        <span style={{ width: 14, height: 14, borderRadius: 3, background: r.primary_color, display: "inline-block" }} />
+        <span style={{ fontSize: 12, color: C.muted }}>superfans.games/<strong style={{ color: C.fg }}>{r.slug}</strong></span>
+      </div>
+      <div style={{ background: "#0A0C11", borderRadius: 10, padding: "8px 12px", marginBottom: 8, fontSize: 11, color: C.muted, lineHeight: 1.8 }}>
+        👤 {r.contact_name}<br />📧 {r.contact_email}<br />📱 {r.contact_phone}<br />
+        🎾 {r.courts} courts · Prize: Rp {(r.monthly_prize || 0).toLocaleString("id-ID")}<br />📅 {fmtDate(r.created_at)}
+      </div>
+      {isApproved && <div style={{ color: C.green, fontSize: 12, fontWeight: 700 }}>✅ Approved & Activated</div>}
+      {isRejected && <div style={{ color: C.red, fontSize: 12, fontWeight: 700 }}>❌ Rejected</div>}
+      {isPending && (
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={onApprove} style={{ flex: 2, background: `${C.green}15`, border: `1px solid ${C.green}40`, color: C.green, padding: "10px 0", borderRadius: 10, fontFamily: "'Barlow Condensed'", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>✓ Approve & Activate</button>
+          <button onClick={onReject} style={{ flex: 1, background: `${C.red}12`, border: `1px solid ${C.red}35`, color: C.red, padding: "10px 0", borderRadius: 10, fontFamily: "'Barlow Condensed'", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>✕ Reject</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Main Dashboard ─────────────────────────────────── */
+type TabKey = "overview" | "registrations" | "venues" | "matches" | "users";
+
+function Dashboard() {
+  const navigate = useNavigate();
+  const { signOut, user } = useAuth();
+  const qc = useQueryClient();
+  const [tab, setTab] = useState<TabKey>("overview");
+
+  // ─── Data queries ────────────────────────────────
+  const { data: venues = [] } = useQuery({
+    queryKey: ["sa-venues"],
     queryFn: async () => {
       const { data, error } = await (supabase as any).from("venues").select("*").order("created_at", { ascending: false });
       if (error) throw error;
@@ -41,10 +160,8 @@ export default function SuperAdminPage() {
     },
   });
 
-  // Fetch pending registrations
-  const { data: registrations = [], isLoading: rLoad } = useQuery({
-    queryKey: ["super-admin-registrations"],
-    enabled: authed,
+  const { data: registrations = [] } = useQuery({
+    queryKey: ["sa-registrations"],
     queryFn: async () => {
       const { data, error } = await (supabase as any).from("venue_registrations").select("*").order("created_at", { ascending: false });
       if (error) throw error;
@@ -52,200 +169,250 @@ export default function SuperAdminPage() {
     },
   });
 
-  const pendingRegs = registrations.filter(r => r.status === "pending");
+  const { data: matches = [] } = useQuery({
+    queryKey: ["sa-matches"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("matches").select("*").order("created_at", { ascending: false }).limit(50);
+      if (error) throw error;
+      return (data ?? []) as MatchRow[];
+    },
+  });
 
-  // ─── Approve registration ──────────────────────────────
+  const { data: profiles = [] } = useQuery({
+    queryKey: ["sa-profiles"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(100);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const pendingRegs = registrations.filter(r => r.status === "pending");
+  const activeVenues = venues.filter(v => v.status === "active");
+  const liveMatches = matches.filter(m => m.status === "live");
+
+  // ─── Actions ─────────────────────────────────────
   const approveRegistration = async (reg: Registration) => {
     try {
-      // 1. Insert into venues table
       const { error: venueErr } = await (supabase as any).from("venues").insert({
-        slug: reg.slug,
-        name: reg.venue_name,
-        city: reg.city,
-        country: reg.country,
-        courts_default: reg.courts,
-        primary_color: reg.primary_color,
-        monthly_prize: reg.monthly_prize,
-        prize_split_1st: reg.prize_split_1st,
-        prize_split_2nd: reg.prize_split_2nd,
-        prize_split_3rd: reg.prize_split_3rd,
-        admin_password_hash: reg.admin_password_hash,
-        logo_url: reg.logo_url,
-        contact_name: reg.contact_name,
-        contact_email: reg.contact_email,
-        contact_phone: reg.contact_phone,
-        status: "active",
+        slug: reg.slug, name: reg.venue_name, city: reg.city, country: reg.country,
+        courts_default: reg.courts, primary_color: reg.primary_color,
+        monthly_prize: reg.monthly_prize, prize_split_1st: reg.prize_split_1st,
+        prize_split_2nd: reg.prize_split_2nd, prize_split_3rd: reg.prize_split_3rd,
+        admin_password_hash: reg.admin_password_hash, logo_url: reg.logo_url,
+        contact_name: reg.contact_name, contact_email: reg.contact_email,
+        contact_phone: reg.contact_phone, status: "active",
       });
       if (venueErr) throw venueErr;
-
-      // 2. Update registration status
-      const { error: regErr } = await (supabase as any).from("venue_registrations")
-        .update({ status: "approved" })
-        .eq("id", reg.id);
+      const { error: regErr } = await (supabase as any).from("venue_registrations").update({ status: "approved" }).eq("id", reg.id);
       if (regErr) throw regErr;
-
-      toast.success(`${reg.venue_name} approved and activated!`);
-      qc.invalidateQueries({ queryKey: ["super-admin-venues"] });
-      qc.invalidateQueries({ queryKey: ["super-admin-registrations"] });
-    } catch (err: any) {
-      toast.error(err.message || "Failed to approve");
-    }
+      toast.success(`${reg.venue_name} approved!`);
+      qc.invalidateQueries({ queryKey: ["sa-venues"] });
+      qc.invalidateQueries({ queryKey: ["sa-registrations"] });
+    } catch (err: any) { toast.error(err.message || "Failed to approve"); }
   };
 
-  // ─── Reject registration ──────────────────────────────
   const rejectRegistration = async (regId: string) => {
     try {
-      const { error } = await (supabase as any).from("venue_registrations")
-        .update({ status: "rejected" })
-        .eq("id", regId);
+      const { error } = await (supabase as any).from("venue_registrations").update({ status: "rejected" }).eq("id", regId);
       if (error) throw error;
       toast.error("Registration rejected");
-      setRejectId(null);
-      setRejectReason("");
-      qc.invalidateQueries({ queryKey: ["super-admin-registrations"] });
-    } catch (err: any) {
-      toast.error(err.message || "Failed to reject");
-    }
+      qc.invalidateQueries({ queryKey: ["sa-registrations"] });
+    } catch (err: any) { toast.error(err.message || "Failed to reject"); }
   };
-
-  // ─── Password gate ────────────────────────────────────
-  if (!authed) {
-    const check = () => {
-      if (pass === SUPER_ADMIN_PASS) setAuthed(true);
-      else { alert("Incorrect password"); setPass(""); }
-    };
-    return (
-      <div style={{ height: "100dvh", background: "#0A0A0E", color: C.fg, maxWidth: 480, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-        <div style={{ width: "100%", maxWidth: 360, textAlign: "center" }}>
-          <div style={{ fontSize: 44, marginBottom: 12 }}>🔐</div>
-          <div className="font-display" style={{ fontSize: 26, fontWeight: 900, color: C.orange, letterSpacing: 1 }}>SUPER ADMIN</div>
-          <div style={{ fontSize: 12, color: C.muted, marginTop: 4, marginBottom: 24 }}>Platform-level access</div>
-          <input value={pass} onChange={e => setPass(e.target.value)} onKeyDown={e => e.key === "Enter" && check()} type="password" placeholder="Super admin password" style={{ width: "100%", background: C.raised, border: `1px solid ${C.border}`, borderRadius: 12, padding: "12px 16px", color: C.fg, fontSize: 14, outline: "none", marginBottom: 10, boxSizing: "border-box" }} />
-          <button onClick={check} style={{ width: "100%", background: C.orange, border: "none", color: "#0A0C11", padding: "13px 0", borderRadius: 12, fontFamily: "'Barlow Condensed'", fontSize: 16, fontWeight: 800, cursor: "pointer", marginBottom: 8 }}>ENTER →</button>
-          <button onClick={() => navigate("/")} style={{ width: "100%", background: "none", border: "none", color: C.muted, padding: "8px 0", fontFamily: "'Barlow Condensed'", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>← Back</button>
-        </div>
-      </div>
-    );
-  }
 
   const fmtDate = (d: string) => new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
 
-  // ─── MAIN ─────────────────────────────────────────────
+  const tabs: { v: TabKey; l: string; n?: number }[] = [
+    { v: "overview", l: "📊 Overview" },
+    { v: "registrations", l: "📝 Reg", n: pendingRegs.length },
+    { v: "venues", l: "🏟️ Venues" },
+    { v: "matches", l: "⚽ Matches" },
+    { v: "users", l: "👥 Users" },
+  ];
+
   return (
-    <div style={{ height: "100dvh", background: "#0A0A0E", color: C.fg, maxWidth: 560, margin: "0 auto", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div style={{ height: "100dvh", background: "#0A0A0E", color: C.fg, maxWidth: 640, margin: "0 auto", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       {/* Header */}
-      <div style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, flexShrink: 0, background: "#0E0D0A" }}>
+      <div style={{ padding: "12px 16px", borderBottom: "1px solid #1E2235", flexShrink: 0, background: "#0E0D0A" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
-            <div className="font-display" style={{ fontSize: 20, fontWeight: 900, color: C.orange, letterSpacing: 1 }}>SUPER ADMIN</div>
-            <div style={{ fontSize: 9, color: C.dim, letterSpacing: 1 }}>SUPERFANS PLATFORM</div>
+            <div className="font-display" style={{ fontSize: 20, fontWeight: 900, color: C.orange, letterSpacing: 1 }}>SUPERFANS HQ</div>
+            <div style={{ fontSize: 9, color: C.dim, letterSpacing: 1 }}>PLATFORM SUPER ADMIN</div>
           </div>
-          <button onClick={() => navigate("/")} style={{ background: C.raised, border: `1px solid ${C.border}`, color: C.muted, padding: "5px 10px", borderRadius: 8, fontFamily: "'Barlow Condensed'", fontSize: 11, fontWeight: 700, cursor: "pointer" }}>← Exit</button>
+          <div style={{ display: "flex", gap: 6 }}>
+            <button onClick={() => navigate("/")} style={headerBtnStyle}>← Home</button>
+            <button onClick={signOut} style={{ ...headerBtnStyle, color: C.red, borderColor: C.red + "30" }}>Sign Out</button>
+          </div>
         </div>
+        <div style={{ fontSize: 10, color: C.dim, marginTop: 4 }}>Logged in as {user?.email}</div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: "flex", borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
-        {([
-          { v: "registrations" as const, l: "📝 Registrations", n: pendingRegs.length },
-          { v: "venues" as const, l: "🏟️ All Venues" },
-        ]).map(t => (
-          <button key={t.v} onClick={() => setTab(t.v)} style={{ flex: 1, padding: "10px 0", background: tab === t.v ? "#0E0D0A" : C.bg, border: "none", borderBottom: tab === t.v ? `2px solid ${C.orange}` : "2px solid transparent", color: tab === t.v ? C.orange : C.muted, fontFamily: "'Barlow Condensed'", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+      <div style={{ display: "flex", borderBottom: "1px solid #1E2235", flexShrink: 0, overflowX: "auto" }}>
+        {tabs.map(t => (
+          <button key={t.v} onClick={() => setTab(t.v)} style={{
+            flex: 1, minWidth: 60, padding: "10px 4px", background: tab === t.v ? "#0E0D0A" : "#0A0A0E",
+            border: "none", borderBottom: tab === t.v ? `2px solid ${C.orange}` : "2px solid transparent",
+            color: tab === t.v ? C.orange : C.muted, fontFamily: "'Barlow Condensed'",
+            fontSize: 11, fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap",
+          }}>
             {t.l}
-            {"n" in t && (t as any).n > 0 && <span style={{ background: C.red, color: "#fff", fontSize: 9, fontWeight: 900, borderRadius: 10, padding: "1px 4px", marginLeft: 4 }}>{(t as any).n}</span>}
+            {t.n != null && t.n > 0 && <span style={{ background: C.red, color: "#fff", fontSize: 9, fontWeight: 900, borderRadius: 10, padding: "1px 4px", marginLeft: 3 }}>{t.n}</span>}
           </button>
         ))}
       </div>
 
+      {/* Content */}
       <div style={{ flex: 1, overflowY: "auto", padding: "12px 16px 90px" }}>
 
-        {/* REGISTRATIONS */}
+        {/* ── OVERVIEW ───────────────────────────── */}
+        {tab === "overview" && (
+          <>
+            <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+              <StatCard icon="🏟️" label="Active Venues" value={activeVenues.length} />
+              <StatCard icon="📝" label="Pending Approvals" value={pendingRegs.length} color={pendingRegs.length > 0 ? C.orange : C.green} />
+            </div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+              <StatCard icon="⚡" label="Live Matches" value={liveMatches.length} color={C.blue} />
+              <StatCard icon="👥" label="Total Users" value={profiles.length} color={C.purple} />
+              <StatCard icon="🎾" label="Total Matches" value={matches.length} color={C.gold} />
+            </div>
+
+            {/* Pending registrations preview */}
+            {pendingRegs.length > 0 && (
+              <>
+                <div style={{ fontSize: 13, fontWeight: 700, color: C.orange, marginBottom: 8 }}>⚠️ Pending Approvals</div>
+                {pendingRegs.slice(0, 3).map(r => (
+                  <RegistrationCard key={r.id} r={r} onApprove={() => approveRegistration(r)} onReject={() => rejectRegistration(r.id)} />
+                ))}
+                {pendingRegs.length > 3 && (
+                  <button onClick={() => setTab("registrations")} style={{ width: "100%", background: "none", border: `1px dashed ${C.orange}40`, color: C.orange, padding: "8px 0", borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>View all {pendingRegs.length} pending →</button>
+                )}
+              </>
+            )}
+
+            {/* Recent activity */}
+            <div style={{ fontSize: 13, fontWeight: 700, color: C.fg, marginTop: 16, marginBottom: 8 }}>📋 Recent Activity</div>
+            {matches.slice(0, 5).map(m => (
+              <div key={m.id} style={{ background: "#14161E", border: "1px solid #1E2235", borderRadius: 12, padding: "10px 14px", marginBottom: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600 }}>{m.player_a_name} vs {m.player_b_name}</div>
+                  <div style={{ fontSize: 10, color: C.muted }}>{m.title} · {fmtDate(m.created_at)}</div>
+                </div>
+                <Tag label={m.status.toUpperCase()} color={m.status === "live" ? C.green : m.status === "upcoming" ? C.orange : C.muted} dot={m.status === "live"} />
+              </div>
+            ))}
+          </>
+        )}
+
+        {/* ── REGISTRATIONS ──────────────────────── */}
         {tab === "registrations" && (
           <>
-            {rLoad ? (
-              <div style={{ textAlign: "center", padding: "32px 0", color: C.muted }}>Loading...</div>
-            ) : registrations.length === 0 ? (
+            <div style={{ fontSize: 11, color: C.muted, marginBottom: 12 }}>All venue registration requests.</div>
+            {registrations.length === 0 ? (
               <div style={{ textAlign: "center", padding: "32px 0" }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>📭</div>
                 <div style={{ fontSize: 14, color: C.muted }}>No registrations yet</div>
               </div>
-            ) : (
-              registrations.map(r => {
-                const isPending = r.status === "pending";
-                const isApproved = r.status === "approved";
-                const isRejected = r.status === "rejected";
-                return (
-                  <div key={r.id} style={{ background: C.card, border: `1px solid ${isPending ? C.orange + "40" : isApproved ? C.green + "30" : C.red + "25"}`, borderRadius: 14, padding: 14, marginBottom: 10 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
-                      <div>
-                        <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 2 }}>{r.venue_name}</div>
-                        <div style={{ fontSize: 12, color: C.muted }}>{r.city}, {r.country}</div>
-                      </div>
-                      <Tag label={r.status.toUpperCase()} color={isPending ? C.orange : isApproved ? C.green : C.red} />
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                      <span style={{ width: 14, height: 14, borderRadius: 3, background: r.primary_color, display: "inline-block" }} />
-                      <span style={{ fontSize: 12, color: C.muted }}>superfans.games/<strong style={{ color: C.fg }}>{r.slug}</strong></span>
-                    </div>
-                    <div style={{ background: C.raised, borderRadius: 10, padding: "8px 12px", marginBottom: 8, fontSize: 11, color: C.muted, lineHeight: 1.8 }}>
-                      👤 {r.contact_name}<br />
-                      📧 {r.contact_email}<br />
-                      📱 {r.contact_phone}<br />
-                      🎾 {r.courts} courts · Prize: Rp {r.monthly_prize.toLocaleString("id-ID")}<br />
-                      📅 {fmtDate(r.created_at)}
-                    </div>
-                    {isApproved && <div style={{ color: C.green, fontSize: 12, fontWeight: 700 }}>✅ Approved & Activated</div>}
-                    {isRejected && <div style={{ color: C.red, fontSize: 12, fontWeight: 700 }}>❌ Rejected</div>}
-                    {isPending && rejectId === r.id && (
-                      <div style={{ marginBottom: 8 }}>
-                        <input value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="Rejection reason (optional)" style={{ width: "100%", background: C.raised, border: `1px solid ${C.border}`, borderRadius: 8, padding: "8px 12px", color: C.fg, fontSize: 12, outline: "none", marginBottom: 6, boxSizing: "border-box" }} />
-                        <div style={{ display: "flex", gap: 6 }}>
-                          <button onClick={() => rejectRegistration(r.id)} style={{ flex: 1, background: C.red, border: "none", color: "#fff", padding: "8px 0", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Confirm Reject</button>
-                          <button onClick={() => { setRejectId(null); setRejectReason(""); }} style={{ flex: 1, background: C.raised, border: `1px solid ${C.border}`, color: C.muted, padding: "8px 0", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Cancel</button>
-                        </div>
-                      </div>
-                    )}
-                    {isPending && rejectId !== r.id && (
-                      <div style={{ display: "flex", gap: 8 }}>
-                        <button onClick={() => approveRegistration(r)} style={{ flex: 2, background: `${C.green}15`, border: `1px solid ${C.green}40`, color: C.green, padding: "10px 0", borderRadius: 10, fontFamily: "'Barlow Condensed'", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>✓ Approve & Activate</button>
-                        <button onClick={() => setRejectId(r.id)} style={{ flex: 1, background: `${C.red}12`, border: `1px solid ${C.red}35`, color: C.red, padding: "10px 0", borderRadius: 10, fontFamily: "'Barlow Condensed'", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>✕ Reject</button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })
-            )}
+            ) : registrations.map(r => (
+              <RegistrationCard key={r.id} r={r} onApprove={() => approveRegistration(r)} onReject={() => rejectRegistration(r.id)} />
+            ))}
           </>
         )}
 
-        {/* ALL VENUES */}
+        {/* ── VENUES ─────────────────────────────── */}
         {tab === "venues" && (
           <>
-            <div style={{ fontSize: 11, color: C.muted, marginBottom: 12 }}>All registered venues on the platform.</div>
-            {vLoad ? (
-              <div style={{ textAlign: "center", padding: "32px 0", color: C.muted }}>Loading...</div>
-            ) : venues.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "32px 0", color: C.muted }}>No venues yet</div>
-            ) : (
-              venues.map((v: Venue) => (
-                <div key={v.id} onClick={() => navigate(`/${v.slug}`)} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: "12px 14px", marginBottom: 8, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <span style={{ width: 12, height: 12, borderRadius: 3, background: v.primary_color || "#00E676", flexShrink: 0 }} />
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: 700 }}>{v.name}</div>
-                      <div style={{ fontSize: 11, color: C.muted }}>/{v.slug} · {v.city || "—"}</div>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    <Tag label={v.status.toUpperCase()} color={v.status === "active" ? C.green : v.status === "suspended" ? C.red : C.orange} />
-                    <div style={{ fontSize: 10, color: C.dim, marginTop: 4 }}>{fmtDate(v.created_at)}</div>
+            <div style={{ fontSize: 11, color: C.muted, marginBottom: 12 }}>{venues.length} venues registered on the platform.</div>
+            {venues.map(v => (
+              <div key={v.id} onClick={() => navigate(`/${v.slug}`)} style={{ background: "#14161E", border: "1px solid #1E2235", borderRadius: 14, padding: "12px 14px", marginBottom: 8, cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ width: 12, height: 12, borderRadius: 3, background: v.primary_color || "#00E676", flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700 }}>{v.name}</div>
+                    <div style={{ fontSize: 11, color: C.muted }}>/{v.slug} · {v.city || "—"} · {v.courts_default || "?"} courts</div>
                   </div>
                 </div>
-              ))
-            )}
+                <div style={{ textAlign: "right" }}>
+                  <Tag label={v.status.toUpperCase()} color={v.status === "active" ? C.green : v.status === "suspended" ? C.red : C.orange} />
+                  <div style={{ fontSize: 10, color: C.dim, marginTop: 4 }}>{fmtDate(v.created_at)}</div>
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+
+        {/* ── MATCHES ────────────────────────────── */}
+        {tab === "matches" && (
+          <>
+            <div style={{ fontSize: 11, color: C.muted, marginBottom: 12 }}>Recent matches across all venues. Host/match management is done by venue admins.</div>
+            {matches.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "32px 0", color: C.muted }}>No matches yet</div>
+            ) : matches.map(m => (
+              <div key={m.id} style={{ background: "#14161E", border: `1px solid ${m.status === "live" ? C.green + "30" : "#1E2235"}`, borderRadius: 14, padding: "12px 14px", marginBottom: 8 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: C.muted }}>{m.title}</div>
+                  <Tag label={m.status.toUpperCase()} color={m.status === "live" ? C.green : m.status === "upcoming" ? C.orange : C.muted} dot={m.status === "live"} />
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <span style={{ fontSize: 14, fontWeight: 700 }}>{m.player_a_name}</span>
+                    <span style={{ fontSize: 12, color: C.muted, margin: "0 6px" }}>vs</span>
+                    <span style={{ fontSize: 14, fontWeight: 700 }}>{m.player_b_name}</span>
+                  </div>
+                  {m.status !== "upcoming" && (
+                    <div className="font-display" style={{ fontSize: 20, fontWeight: 900, letterSpacing: 2 }}>
+                      <span style={{ color: m.winner === "a" ? C.green : C.fg }}>{m.score_a}</span>
+                      <span style={{ color: C.dim, margin: "0 4px" }}>-</span>
+                      <span style={{ color: m.winner === "b" ? C.green : C.fg }}>{m.score_b}</span>
+                    </div>
+                  )}
+                </div>
+                <div style={{ fontSize: 10, color: C.dim, marginTop: 4 }}>
+                  👥 {m.fans} fans · 💰 {m.pool.toLocaleString()} pool · {fmtDate(m.created_at)}
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+
+        {/* ── USERS ──────────────────────────────── */}
+        {tab === "users" && (
+          <>
+            <div style={{ fontSize: 11, color: C.muted, marginBottom: 12 }}>{profiles.length} registered users on the platform.</div>
+            {profiles.map((p: any) => (
+              <div key={p.id} style={{ background: "#14161E", border: "1px solid #1E2235", borderRadius: 12, padding: "10px 14px", marginBottom: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: `${C.green}20`, border: `1px solid ${C.green}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: C.green }}>
+                    {(p.display_name || p.username || "?").slice(0, 2).toUpperCase()}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700 }}>{p.display_name || p.username || "Anonymous"}</div>
+                    <div style={{ fontSize: 10, color: C.muted }}>@{p.username || "—"} · {p.points} pts</div>
+                  </div>
+                </div>
+                <div style={{ fontSize: 10, color: C.dim }}>{fmtDate(p.created_at)}</div>
+              </div>
+            ))}
           </>
         )}
       </div>
     </div>
+  );
+}
+
+const headerBtnStyle: React.CSSProperties = {
+  background: "#14161E", border: "1px solid #1E2235", color: C.muted,
+  padding: "5px 10px", borderRadius: 8, fontFamily: "'Barlow Condensed'",
+  fontSize: 11, fontWeight: 700, cursor: "pointer",
+};
+
+/* ── Export ──────────────────────────────────────────── */
+export default function SuperAdminPage() {
+  return (
+    <AuthGate>
+      <Dashboard />
+    </AuthGate>
   );
 }
