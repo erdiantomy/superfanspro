@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, X, Loader2, ChevronLeft, ChevronRight, Send } from "lucide-react";
+import { notifyAdmin } from "@/lib/notifyAdmin";
 
 // ─── TYPES ────────────────────────────────────────────
 interface FormData {
@@ -147,6 +148,20 @@ export default function RegisterPage() {
         logo_url: form.logo_url || null,
       });
       if (error) throw error;
+      // Notify super admin
+      notifyAdmin({
+        type: "venue_registration",
+        subject: `New Venue Registration: ${form.venue_name.trim()}`,
+        body: `${form.contact_name.trim()} submitted a venue registration for "${form.venue_name.trim()}" in ${form.city.trim()}, ${form.country.trim()}.`,
+        metadata: {
+          "Venue": form.venue_name.trim(),
+          "Contact": form.contact_name.trim(),
+          "Email": form.contact_email.trim(),
+          "Phone": form.contact_phone.trim(),
+          "City": form.city.trim(),
+          "Courts": String(form.courts),
+        },
+      });
       setSubmitted(true);
     } catch (err: any) {
       setErrors({ submit: err.message || "Something went wrong" });

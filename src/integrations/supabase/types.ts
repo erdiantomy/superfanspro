@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_notifications: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          metadata: Json
+          read: boolean
+          recipient: string
+          subject: string
+          type: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          read?: boolean
+          recipient: string
+          subject: string
+          type?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          read?: boolean
+          recipient?: string
+          subject?: string
+          type?: string
+        }
+        Relationships: []
+      }
       credit_packages: {
         Row: {
           bonus_pct: number

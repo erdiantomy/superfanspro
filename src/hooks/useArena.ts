@@ -207,6 +207,21 @@ export function useCreateSession() {
         .select()
         .single();
       if (error) throw error;
+      // Notify super admin about new session request
+      import("@/lib/notifyAdmin").then(({ notifyAdmin }) => {
+        notifyAdmin({
+          type: "session_request",
+          subject: `New Session Request: ${session.name}`,
+          body: `A host requested a new "${session.format}" session "${session.name}" scheduled for ${new Date(session.scheduled_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}.`,
+          metadata: {
+            "Session": session.name,
+            "Format": session.format,
+            "Partner Type": session.partner_type,
+            "Courts": String(session.courts),
+            "Max Players": String(session.max_players),
+          },
+        });
+      });
       return data;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["sessions"] }),
