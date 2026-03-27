@@ -466,7 +466,7 @@ export default function HomePage() {
               <div style={{ fontSize: 13, color: "#888", lineHeight: 1.6 }}>Applied only to support pools. No monthly subscription, no setup fees.</div>
             </div>
           </div>
-          <p style={{ fontSize: 13, color: "#666", marginTop: 20 }}>Want to discuss a venue partnership? <a href="mailto:hello@superfans.games" style={{ color: GREEN, textDecoration: "none", fontWeight: 600 }}>Contact us</a></p>
+          <p style={{ fontSize: 13, color: "#666", marginTop: 20 }}>Want to discuss a venue partnership? <a href="https://wa.me/6281218153309" target="_blank" rel="noopener noreferrer" style={{ color: GREEN, textDecoration: "none", fontWeight: 600 }}>Contact us on WhatsApp</a></p>
         </div>
       </section>
 
@@ -481,7 +481,7 @@ export default function HomePage() {
           {[
             { label: "Register", to: "/register" },
             { label: "How it works", to: "/#how-it-works" },
-            { label: "Contact", href: "mailto:hello@superfans.games" },
+            { label: "Contact", href: "https://wa.me/6281218153309" },
           ].map((l, i) => (
             "to" in l ? (
               <button key={i} onClick={() => navigate(l.to)} style={{ background: "none", border: "none", color: "#666", fontSize: 13, fontWeight: 600, cursor: "pointer", padding: 0 }}>{l.label}</button>
