@@ -276,10 +276,10 @@ function CreateSessionForm({ onDone, hostId }: { onDone: () => void; hostId: str
 
                 <div style={{ marginBottom:16 }}>
                   <div style={{ fontSize:11, color:C.muted, fontWeight:600, textTransform:"uppercase", letterSpacing:1, marginBottom:8 }}>Courts</div>
-                  <div style={{ display:"flex", gap:8 }}>
-                    {[1,2,3,4].map(c => (
-                      <button key={c} onClick={() => setCourts(c)} style={{ flex:1, padding:"10px 0", borderRadius:12, background:courts===c?`${C.blue}18`:C.raised, border:`1px solid ${courts===c?C.blue+"50":C.border}`, color:courts===c?C.blue:C.muted, fontFamily:"'Barlow Condensed'", fontSize:18, fontWeight:800, cursor:"pointer" }}>{c}</button>
-                    ))}
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <button onClick={() => setCourts(Math.max(1, courts - 1))} style={{ width:40, height:40, borderRadius:12, background:C.raised, border:`1px solid ${C.border}`, color:C.muted, fontFamily:"'Barlow Condensed'", fontSize:22, fontWeight:800, cursor:"pointer" }}>−</button>
+                    <div style={{ flex:1, textAlign:"center", padding:"10px 0", borderRadius:12, background:`${C.blue}18`, border:`1px solid ${C.blue}50`, color:C.blue, fontFamily:"'Barlow Condensed'", fontSize:22, fontWeight:800 }}>{courts}</div>
+                    <button onClick={() => setCourts(courts + 1)} style={{ width:40, height:40, borderRadius:12, background:C.raised, border:`1px solid ${C.border}`, color:C.muted, fontFamily:"'Barlow Condensed'", fontSize:22, fontWeight:800, cursor:"pointer" }}>+</button>
                   </div>
                   <div style={{ fontSize:10, color:C.dim, marginTop:4 }}>{courts} court{courts>1?"s":""} = {courts*4} players/round · doubles</div>
                 </div>
