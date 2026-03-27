@@ -687,6 +687,129 @@ const headerBtnStyle: React.CSSProperties = {
   fontSize: 11, fontWeight: 700, cursor: "pointer",
 };
 
+/* ── Notifications Tab Component ─────────────────── */
+const NOTIF_TYPES = [
+  { value: "all", label: "All", emoji: "📋" },
+  { value: "venue_registration", label: "Venues", emoji: "🏟️" },
+  { value: "session_request", label: "Sessions", emoji: "🎾" },
+  { value: "payment_completed", label: "Payments", emoji: "💰" },
+  { value: "score_submitted", label: "Scores", emoji: "📊" },
+  { value: "general", label: "General", emoji: "📢" },
+] as const;
+
+const typeEmoji: Record<string, string> = { venue_registration: "🏟️", session_request: "🎾", payment_completed: "💰", score_submitted: "📊", general: "📢" };
+const typeLabel: Record<string, string> = { venue_registration: "Venue Registration", session_request: "Session Request", payment_completed: "Payment", score_submitted: "Score Submitted", general: "General" };
+const typeColor: Record<string, string> = { venue_registration: "#FF9800", session_request: "#00E676", payment_completed: "#FFD700", score_submitted: "#4A9EFF", general: "#6D7A94" };
+
+function NotificationsTab({ notifs, unreadCount, markAllRead }: { notifs: any[]; unreadCount: number; markAllRead: () => void }) {
+  const [filter, setFilter] = useState<string>("all");
+  const [readFilter, setReadFilter] = useState<"all" | "unread" | "read">("all");
+
+  const filtered = notifs.filter(n => {
+    if (filter !== "all" && n.type !== filter) return false;
+    if (readFilter === "unread" && n.read) return false;
+    if (readFilter === "read" && !n.read) return false;
+    return true;
+  });
+
+  const typeCounts = notifs.reduce((acc: Record<string, number>, n: any) => {
+    acc[n.type] = (acc[n.type] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  return (
+    <>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+        <div>
+          <div className="font-display" style={{ fontSize: 16, fontWeight: 800 }}>Admin Notifications</div>
+          <div style={{ fontSize: 11, color: "#6D7A94" }}>{unreadCount} unread · {notifs.length} total</div>
+        </div>
+        {unreadCount > 0 && (
+          <button onClick={markAllRead} style={{ background: "#00E67615", border: "1px solid #00E67640", color: "#00E676", padding: "6px 14px", borderRadius: 8, fontFamily: "'Barlow Condensed'", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+            ✓ Mark all read
+          </button>
+        )}
+      </div>
+
+      {/* Type filter chips */}
+      <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
+        {NOTIF_TYPES.map(t => {
+          const count = t.value === "all" ? notifs.length : (typeCounts[t.value] || 0);
+          const active = filter === t.value;
+          return (
+            <button key={t.value} onClick={() => setFilter(t.value)} style={{
+              background: active ? "#1E2235" : "#0A0A0E",
+              border: `1px solid ${active ? (t.value === "all" ? "#FF9800" : typeColor[t.value] || "#1E2235") : "#1E2235"}`,
+              color: active ? "#E8ECF4" : "#6D7A94",
+              padding: "5px 10px", borderRadius: 8, fontSize: 11, fontWeight: 700,
+              fontFamily: "'Barlow Condensed'", cursor: "pointer", display: "flex", alignItems: "center", gap: 4,
+            }}>
+              {t.emoji} {t.label}
+              {count > 0 && <span style={{ background: active ? "#ffffff20" : "#1E2235", padding: "0 4px", borderRadius: 6, fontSize: 9, fontWeight: 900 }}>{count}</span>}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Read/Unread filter */}
+      <div style={{ display: "flex", gap: 4, marginBottom: 14 }}>
+        {(["all", "unread", "read"] as const).map(v => (
+          <button key={v} onClick={() => setReadFilter(v)} style={{
+            background: readFilter === v ? "#1E2235" : "transparent",
+            border: "none", color: readFilter === v ? "#E8ECF4" : "#3A4560",
+            padding: "4px 10px", borderRadius: 6, fontSize: 10, fontWeight: 700,
+            fontFamily: "'Barlow Condensed'", cursor: "pointer", textTransform: "uppercase", letterSpacing: 0.5,
+          }}>
+            {v === "all" ? "All" : v === "unread" ? `Unread (${unreadCount})` : "Read"}
+          </button>
+        ))}
+      </div>
+
+      {/* List */}
+      {filtered.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "40px 0" }}>
+          <div style={{ fontSize: 40, marginBottom: 12 }}>🔕</div>
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4 }}>
+            {filter === "all" && readFilter === "all" ? "No notifications yet" : "No matching notifications"}
+          </div>
+          <div style={{ fontSize: 12, color: "#6D7A94" }}>
+            {filter === "all" && readFilter === "all"
+              ? "Notifications from venue registrations, sessions, scores, and payments will appear here."
+              : "Try changing the filter to see more notifications."}
+          </div>
+        </div>
+      ) : (
+        filtered.map((n: any) => (
+          <div key={n.id} style={{ background: n.read ? "#14161E" : "#1a1c2a", border: `1px solid ${n.read ? "#1E2235" : (typeColor[n.type] || "#FF9800") + "30"}`, borderRadius: 12, padding: 14, marginBottom: 8 }}>
+            <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+              <span style={{ fontSize: 22, flexShrink: 0 }}>{typeEmoji[n.type] || "📢"}</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                  <Tag label={typeLabel[n.type] || n.type} color={typeColor[n.type] || "#6D7A94"} />
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ fontSize: 10, color: "#3A4560" }}>{getTimeAgo(n.created_at)}</span>
+                    {!n.read && <span style={{ width: 8, height: 8, borderRadius: 4, background: "#FF9800" }} />}
+                  </div>
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: n.read ? "#6D7A94" : "#E8ECF4", marginBottom: 4 }}>{n.subject}</div>
+                <div style={{ fontSize: 12, color: "#3A4560", lineHeight: 1.4 }}>{n.body}</div>
+                {n.metadata && Object.keys(n.metadata).length > 0 && (
+                  <div style={{ background: "#0A0C11", borderRadius: 8, padding: "8px 10px", marginTop: 8, fontSize: 11, color: "#6D7A94", lineHeight: 1.8 }}>
+                    {Object.entries(n.metadata).map(([k, v]) => (
+                      <div key={k}><strong style={{ color: "#3A4560" }}>{k}:</strong> {String(v)}</div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+    </>
+  );
+}
+
 /* ── Export ──────────────────────────────────────────── */
 export default function SuperAdminPage() {
   return (
