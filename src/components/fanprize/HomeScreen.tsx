@@ -6,13 +6,15 @@ import { idr } from "@/data/constants";
 import { Avatar, LiveDot, SportTag, SupportBar, SectionHead } from "./UIElements";
 import { container, item } from "./MotionVariants";
 import Odometer from "./Odometer";
+import NotificationBell from "@/components/ui/NotificationBell";
 import logo from "@/assets/superfans-logo.png";
 
 interface HomeProps {
   onPick: (m: Match) => void;
+  onNotifications?: () => void;
 }
 
-export default function HomeScreen({ onPick }: HomeProps) {
+export default function HomeScreen({ onPick, onNotifications }: HomeProps) {
   const { data: matches = [], isLoading } = useMatches();
   const { data: leaderboard = [] } = useLeaderboard();
   const [pool, setPool] = useState(2450000);
@@ -51,6 +53,7 @@ export default function HomeScreen({ onPick }: HomeProps) {
           <div className="bg-card border border-subtle rounded-[20px] px-3 py-1.5 text-[12px] text-green font-semibold flex items-center gap-1.5">
             🪙 5,680
           </div>
+          <NotificationBell onClick={onNotifications} />
           <Avatar s="TR" size={34} />
         </div>
       </motion.div>
