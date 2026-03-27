@@ -501,6 +501,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      verify_venue_password: {
+        Args: { plain_password: string; venue_slug: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
