@@ -471,24 +471,11 @@ export default function HomePage() {
       </section>
 
       {/* FOOTER */}
-      <footer style={{ padding: "28px 16px", maxWidth: 800, margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, textAlign: "center" }}>
+      <footer style={{ padding: "28px 16px", maxWidth: 800, margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 8, textAlign: "center" }}>
         <div>
           <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 18, fontWeight: 900, letterSpacing: 1 }}>SUPERFANS</span>
           <span style={{ fontSize: 9, color: "#999", letterSpacing: 1 }}>.GAMES</span>
           <div style={{ fontSize: 12, color: "#999", marginTop: 4 }}>Built for padel communities across Southeast Asia</div>
-        </div>
-        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
-          {[
-            { label: "Register", to: "/register" },
-            { label: "How it works", to: "/#how-it-works" },
-            { label: "Contact", href: "https://wa.me/6281218153309" },
-          ].map((l, i) => (
-            "to" in l ? (
-              <button key={i} onClick={() => navigate(l.to)} style={{ background: "none", border: "none", color: "#666", fontSize: 13, fontWeight: 600, cursor: "pointer", padding: 0 }}>{l.label}</button>
-            ) : (
-              <a key={i} href={l.href} style={{ color: "#666", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>{l.label}</a>
-            )
-          ))}
         </div>
       </footer>
     </div>
