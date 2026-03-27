@@ -53,7 +53,7 @@ export default function HostDashboard() {
     );
   }
 
-  if (view === "create") return <CreateSessionForm onDone={() => setView("list")} hostId={me?.id ?? ""} />;
+  if (view === "create") return <CreateSessionForm onDone={() => setView("list")} hostId={me?.id ?? ""} venueId={venue?.id} />;
 
   return (
     <div style={{ height:"100dvh", background:C.bg, color:C.fg, maxWidth:480, margin:"0 auto", display:"flex", flexDirection:"column", overflow:"hidden", fontFamily:"'DM Sans',sans-serif" }}>
