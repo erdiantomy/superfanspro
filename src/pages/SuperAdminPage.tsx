@@ -204,6 +204,8 @@ function Dashboard() {
     },
   });
 
+  type TabKey = "overview" | "registrations" | "venues" | "matches" | "users" | "revenue" | "notifications";
+
   const [showNotifs, setShowNotifs] = useState(false);
 
   const markAllRead = async () => {
