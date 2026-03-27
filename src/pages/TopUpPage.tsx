@@ -186,7 +186,7 @@ export default function TopUpPage() {
                         )}
                       </div>
                       <div className="text-xs text-muted-foreground mt-0.5">
-                        {fmtCr(pkg.credits)} Credits · Worth {fmtRp(worthValue)}
+                        {fmtCr(pkg.credits)} Credits
                       </div>
                     </div>
 
