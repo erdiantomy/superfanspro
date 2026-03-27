@@ -142,7 +142,7 @@ function RegistrationCard({ r, onApprove, onReject }: { r: Registration; onAppro
 }
 
 /* ── Main Dashboard ─────────────────────────────────── */
-type TabKey = "overview" | "registrations" | "venues" | "matches" | "users";
+type TabKey = "overview" | "registrations" | "venues" | "matches" | "users" | "revenue";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -229,6 +229,7 @@ function Dashboard() {
     { v: "venues", l: "🏟️ Venues" },
     { v: "matches", l: "⚽ Matches" },
     { v: "users", l: "👥 Users" },
+    { v: "revenue", l: "💰 Revenue" },
   ];
 
   return (
@@ -397,6 +398,59 @@ function Dashboard() {
             ))}
           </>
         )}
+
+        {/* ── REVENUE ────────────────────────────── */}
+        {tab === "revenue" && (() => {
+          const totalPool = matches.reduce((sum, m) => sum + (m.pool || 0), 0);
+          const platformFees = Math.round(totalPool * 0.1);
+          const totalMatches = matches.length;
+
+          // Group by venue (match title typically contains venue info)
+          const venuePoolMap: Record<string, { pool: number; matches: number; fans: number }> = {};
+          for (const m of matches) {
+            const key = m.title || "Unknown";
+            if (!venuePoolMap[key]) venuePoolMap[key] = { pool: 0, matches: 0, fans: 0 };
+            venuePoolMap[key].pool += m.pool || 0;
+            venuePoolMap[key].matches += 1;
+            venuePoolMap[key].fans += m.fans || 0;
+          }
+          const venueRevenue = Object.entries(venuePoolMap)
+            .map(([name, d]) => ({ name, ...d, avgPool: d.matches > 0 ? Math.round(d.pool / d.matches) : 0 }))
+            .sort((a, b) => b.pool - a.pool);
+
+          return (
+            <>
+              <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+                <StatCard icon="💰" label="Total Pools" value={`Rp ${totalPool.toLocaleString("id-ID")}`} color={C.green} />
+                <StatCard icon="🏦" label="Platform Fees (10%)" value={`Rp ${platformFees.toLocaleString("id-ID")}`} color={C.gold} />
+              </div>
+              <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+                <StatCard icon="🎾" label="Total Matches" value={totalMatches} color={C.blue} />
+                <StatCard icon="👥" label="Total Fans" value={matches.reduce((s, m) => s + (m.fans || 0), 0)} color={C.purple} />
+              </div>
+
+              <div style={{ fontSize: 13, fontWeight: 700, color: C.fg, marginBottom: 8 }}>📊 Revenue by Venue / Event</div>
+              {venueRevenue.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "32px 0", color: C.muted }}>No match data yet</div>
+              ) : venueRevenue.map((v, i) => (
+                <div key={i} style={{ background: "#14161E", border: "1px solid #1E2235", borderRadius: 14, padding: "12px 14px", marginBottom: 8 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700 }}>{v.name}</div>
+                    <div className="font-display" style={{ fontSize: 16, fontWeight: 900, color: C.green }}>Rp {v.pool.toLocaleString("id-ID")}</div>
+                  </div>
+                  <div style={{ display: "flex", gap: 16, fontSize: 11, color: C.muted }}>
+                    <span>🎾 {v.matches} matches</span>
+                    <span>👥 {v.fans} fans</span>
+                    <span>📊 Avg: Rp {v.avgPool.toLocaleString("id-ID")}</span>
+                  </div>
+                  <div style={{ fontSize: 10, color: C.dim, marginTop: 4 }}>
+                    Platform fee: <span style={{ color: C.gold }}>Rp {Math.round(v.pool * 0.1).toLocaleString("id-ID")}</span>
+                  </div>
+                </div>
+              ))}
+            </>
+          );
+        })()}
       </div>
     </div>
   );
