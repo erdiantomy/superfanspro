@@ -10,6 +10,7 @@ import logo from "@/assets/superfans-logo.png";
 export default function HostDashboard() {
   const navigate          = useNavigate();
   const { user }          = useAuth();
+  const { venue }         = useVenue();
   const { data: me, isLoading: meLoading, refetch: refetchMe } = usePadelPlayer(user?.id);
   const { data: allSessions = [] } = useSessions();
   const [view, setView]   = useState<"list" | "create">("list");
