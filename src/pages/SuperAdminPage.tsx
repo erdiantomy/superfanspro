@@ -523,6 +523,50 @@ function RevenueTab({ matches }: { matches: MatchRow[] }) {
         <StatCard icon="👥" label="Total Fans" value={filteredMatches.reduce((s, m) => s + (m.fans || 0), 0)} color={C.purple} />
       </div>
 
+      {/* Pool Trend Chart */}
+      {filteredMatches.length > 0 && (() => {
+        const sorted = [...filteredMatches].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        const grouped: Record<string, { pool: number; fees: number; matches: number }> = {};
+        for (const m of sorted) {
+          const key = format(new Date(m.created_at), "dd MMM");
+          if (!grouped[key]) grouped[key] = { pool: 0, fees: 0, matches: 0 };
+          grouped[key].pool += m.pool || 0;
+          grouped[key].fees += Math.round((m.pool || 0) * 0.1);
+          grouped[key].matches += 1;
+        }
+        const chartData = Object.entries(grouped).map(([date, d]) => ({ date, ...d }));
+
+        return (
+          <div style={{ background: "#14161E", border: "1px solid #1E2235", borderRadius: 14, padding: "14px 8px 8px 0", marginBottom: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: C.fg, marginBottom: 10, paddingLeft: 16 }}>📈 Pool Trend</div>
+            <ResponsiveContainer width="100%" height={180}>
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="poolGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={C.green} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={C.green} stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="feeGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={C.gold} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={C.gold} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1E2235" />
+                <XAxis dataKey="date" tick={{ fill: "#5A6178", fontSize: 9 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: "#5A6178", fontSize: 9 }} axisLine={false} tickLine={false} tickFormatter={(v: number) => v >= 1000000 ? `${(v / 1000000).toFixed(1)}M` : v >= 1000 ? `${(v / 1000).toFixed(0)}K` : String(v)} />
+                <Tooltip
+                  contentStyle={{ background: "#0E0D0A", border: "1px solid #1E2235", borderRadius: 10, fontSize: 11 }}
+                  labelStyle={{ color: C.fg, fontWeight: 700, marginBottom: 4 }}
+                  formatter={(value: number, name: string) => [`Rp ${value.toLocaleString("id-ID")}`, name === "pool" ? "Pool" : "Fees"]}
+                />
+                <Area type="monotone" dataKey="pool" stroke={C.green} fill="url(#poolGrad)" strokeWidth={2} />
+                <Area type="monotone" dataKey="fees" stroke={C.gold} fill="url(#feeGrad)" strokeWidth={1.5} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        );
+      })()}
+
       <div style={{ fontSize: 13, fontWeight: 700, color: C.fg, marginBottom: 8 }}>📊 Revenue by Venue / Event</div>
       {venueRevenue.length === 0 ? (
         <div style={{ textAlign: "center", padding: "32px 0", color: C.muted }}>No match data in this period</div>
