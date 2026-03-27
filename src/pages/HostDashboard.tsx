@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useVenue } from "@/hooks/useVenue";
@@ -30,16 +32,7 @@ export default function HostDashboard() {
   const myOwnSessions = allSessions.filter(s => me && s.host_id === me.id);
 
   if (!user) {
-    return (
-      <div style={{ height:"100dvh", background:C.bg, color:C.fg, maxWidth:480, margin:"0 auto", display:"flex", alignItems:"center", justifyContent:"center", padding:24, fontFamily:"'DM Sans',sans-serif", textAlign:"center" }}>
-        <div>
-          <div style={{ fontSize:36, marginBottom:12 }}>🔐</div>
-          <div className="font-display" style={{ fontSize:20, fontWeight:900, marginBottom:8 }}>Sign in required</div>
-          <div style={{ fontSize:12, color:C.muted, marginBottom:20 }}>You need to be signed in to host sessions</div>
-          <button onClick={() => navigate("/auth")} style={{ background:C.green, border:"none", color:"#0A0C11", padding:"12px 24px", borderRadius:12, fontFamily:"'Barlow Condensed'", fontSize:16, fontWeight:800, cursor:"pointer" }}>SIGN IN →</button>
-        </div>
-      </div>
-    );
+    return <HostSignIn />;
   }
 
   if (meLoading || ensuring) {
@@ -306,6 +299,79 @@ function CreateSessionForm({ onDone, hostId, venueId }: { onDone: () => void; ho
             )}
           </>
         )}
+      </div>
+    </div>
+  );
+}
+
+/* ── Inline sign-in for host dashboard ── */
+function HostSignIn() {
+  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      if (mode === "signup") {
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
+        toast.success("Check your email to confirm your account");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+      }
+    } catch (err: any) {
+      setError(err.message || "Authentication failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogle = () => {
+    lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.href });
+  };
+
+  return (
+    <div style={{ height: "100dvh", background: C.bg, color: C.fg, maxWidth: 480, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'DM Sans',sans-serif" }}>
+      <div style={{ width: "100%", maxWidth: 340 }}>
+        <div style={{ textAlign: "center", marginBottom: 24 }}>
+          <div style={{ fontSize: 36, marginBottom: 12 }}>🔐</div>
+          <div className="font-display" style={{ fontSize: 20, fontWeight: 900, marginBottom: 4 }}>Sign in to host</div>
+          <div style={{ fontSize: 12, color: C.muted }}>Use email/password or Google</div>
+        </div>
+
+        <button onClick={handleGoogle} style={{ width: "100%", background: C.raised, border: `1px solid ${C.border}`, color: C.fg, padding: "12px 16px", borderRadius: 12, fontFamily: "'Barlow Condensed'", fontSize: 14, fontWeight: 700, cursor: "pointer", marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.09 24.09 0 0 0 0 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Sign in with Google
+        </button>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+          <div style={{ flex: 1, height: 1, background: C.border }} />
+          <span style={{ fontSize: 11, color: C.dim, fontWeight: 600 }}>OR</span>
+          <div style={{ flex: 1, height: 1, background: C.border }} />
+        </div>
+
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required style={{ background: C.raised, border: `1px solid ${C.border}`, color: C.fg, padding: "10px 14px", borderRadius: 10, fontSize: 14, outline: "none" }} />
+          <input type="password" placeholder="Password (min 6 chars)" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} style={{ background: C.raised, border: `1px solid ${C.border}`, color: C.fg, padding: "10px 14px", borderRadius: 10, fontSize: 14, outline: "none" }} />
+
+          {error && <div style={{ fontSize: 12, color: "#ef4444", textAlign: "center" }}>{error}</div>}
+
+          <button type="submit" disabled={loading} style={{ background: C.green, border: "none", color: "#0A0C11", padding: "12px 24px", borderRadius: 12, fontFamily: "'Barlow Condensed'", fontSize: 16, fontWeight: 800, cursor: "pointer", opacity: loading ? 0.6 : 1 }}>
+            {loading ? "..." : mode === "login" ? "SIGN IN" : "SIGN UP"}
+          </button>
+        </form>
+
+        <div style={{ textAlign: "center", marginTop: 14 }}>
+          <button onClick={() => { setMode(m => m === "login" ? "signup" : "login"); setError(""); }} style={{ background: "none", border: "none", color: C.green, fontSize: 12, fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>
+            {mode === "login" ? "Need an account? Sign up" : "Already have an account? Sign in"}
+          </button>
+        </div>
       </div>
     </div>
   );
