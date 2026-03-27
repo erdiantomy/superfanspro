@@ -290,10 +290,20 @@ function Dashboard() {
     try {
       const { error } = await (supabase as any).from("venues").delete().eq("id", venue.id);
       if (error) throw error;
-      toast.success(`${venue.name} removed successfully`);
+      toast.success(`${venue.name} removed permanently`);
       qc.invalidateQueries({ queryKey: ["sa-venues"] });
       setVenueToDelete(null);
     } catch (err: any) { toast.error(err.message || "Failed to delete venue"); }
+  };
+
+  const toggleVenueStatus = async (venue: Venue) => {
+    const newStatus = venue.status === "active" ? "suspended" : "active";
+    try {
+      const { error } = await (supabase as any).from("venues").update({ status: newStatus }).eq("id", venue.id);
+      if (error) throw error;
+      toast.success(`${venue.name} ${newStatus === "suspended" ? "suspended" : "reactivated"}!`);
+      qc.invalidateQueries({ queryKey: ["sa-venues"] });
+    } catch (err: any) { toast.error(err.message || "Failed to update venue status"); }
   };
 
   const fmtDate = (d: string) => new Date(d).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
@@ -458,11 +468,15 @@ function Dashboard() {
                     <div style={{ fontSize: 10, color: C.dim, marginTop: 4 }}>{fmtDate(v.created_at)}</div>
                   </div>
                 </div>
-                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8, paddingTop: 8, borderTop: "1px solid #1E2235" }}>
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: 6, marginTop: 8, paddingTop: 8, borderTop: "1px solid #1E2235" }}>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); toggleVenueStatus(v); }}
+                    style={{ background: v.status === "active" ? `${C.orange}15` : `${C.green}15`, border: `1px solid ${v.status === "active" ? C.orange + "35" : C.green + "35"}`, color: v.status === "active" ? C.orange : C.green, padding: "6px 14px", borderRadius: 8, fontFamily: "'Barlow Condensed'", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
+                  >{v.status === "active" ? "⏸ Suspend" : "▶ Reactivate"}</button>
                   <button
                     onClick={(e) => { e.stopPropagation(); setVenueToDelete(v); }}
                     style={{ background: `${C.red}15`, border: `1px solid ${C.red}35`, color: C.red, padding: "6px 14px", borderRadius: 8, fontFamily: "'Barlow Condensed'", fontSize: 12, fontWeight: 700, cursor: "pointer" }}
-                  >🗑 Remove Venue</button>
+                  >🗑 Delete</button>
                 </div>
               </div>
             ))}
