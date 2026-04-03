@@ -240,7 +240,7 @@ export default function SessionPage() {
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                       <Av initials={sp.player.avatar} size={44} color={getDivision(sp.player.lifetime_xp).color} />
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 14, fontWeight: 700 }}>{sp.player.name}</div>
+                        <div style={{ fontSize: 14, fontWeight: 700 }}><PlayerLink player={sp.player} size={44} showAvatar={false} /></div>
                         <div style={{ fontSize: 11, color: C.muted }}>{sp.player.email}</div>
                         {sp.created_at && <div style={{ fontSize: 10, color: C.dim, marginTop: 2 }}>Requested {fmtTs(sp.created_at)}</div>}
                       </div>
