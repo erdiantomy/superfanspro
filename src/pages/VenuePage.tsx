@@ -29,6 +29,11 @@ export default function VenuePage() {
 
   useArenaRealtime();
 
+  useEffect(() => {
+    document.title = venue ? `${venue.name} | SuperFans` : "SuperFans";
+    return () => { document.title = "SuperFans — Play. Compete. Get Supported."; };
+  }, [venue]);
+
   const venueId = venue?.id;
   const accent = venue?.primary_color || C.green;
 

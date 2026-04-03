@@ -17,6 +17,11 @@ export default function RankPage() {
   const [tab, setTab] = useState<"monthly" | "lifetime">("monthly");
   useArenaRealtime();
 
+  useEffect(() => {
+    document.title = "Rankings | SuperFans";
+    return () => { document.title = "SuperFans — Play. Compete. Get Supported."; };
+  }, []);
+
   const { data: monthly  = [], isLoading: mLoad } = useMonthlyLeaderboard();
   const { data: lifetime = [], isLoading: lLoad } = useLifetimeLeaderboard();
 
