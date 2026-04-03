@@ -19,6 +19,8 @@ import TopUpPage          from "@/pages/TopUpPage";
 import PaymentSuccessPage from "@/pages/PaymentSuccessPage";
 import PaymentFailedPage  from "@/pages/PaymentFailedPage";
 import NotFound           from "@/pages/NotFound";
+import PlayerDashboard    from "@/pages/PlayerDashboard";
+import SlugResolver       from "@/components/profile/SlugResolver";
 
 import "./App.css";
 
@@ -64,13 +66,15 @@ const App = () => (
             <Route path="/session/:code"   element={<LegacySessionRedirect />} />
             <Route path="/match/:code"     element={<LegacyMatchRedirect />} />
 
-            {/* Venue-scoped routes */}
-            <Route path="/:slug"               element={<VenueLayout><VenuePage /></VenueLayout>} />
+            {/* Venue-scoped routes (with explicit sub-paths first) */}
+            <Route path="/:slug/dashboard"     element={<PlayerDashboard />} />
             <Route path="/:slug/rank"          element={<VenueLayout><RankPage /></VenueLayout>} />
             <Route path="/:slug/host"          element={<VenueLayout><HostDashboard /></VenueLayout>} />
             <Route path="/:slug/admin"         element={<VenueLayout><AdminPage /></VenueLayout>} />
             <Route path="/:slug/session/:code" element={<VenueLayout><SessionPage /></VenueLayout>} />
             <Route path="/:slug/match/:code"   element={<VenueLayout><SessionPage /></VenueLayout>} />
+            {/* Slug resolver: player profile or venue page */}
+            <Route path="/:slug"               element={<SlugResolver />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
