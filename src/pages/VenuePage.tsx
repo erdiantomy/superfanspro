@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -28,6 +28,11 @@ export default function VenuePage() {
   const [rankTab, setRankTab] = useState<"monthly" | "lifetime">("monthly");
 
   useArenaRealtime();
+
+  useEffect(() => {
+    document.title = venue ? `${venue.name} | SuperFans` : "SuperFans";
+    return () => { document.title = "SuperFans — Play. Compete. Get Supported."; };
+  }, [venue]);
 
   const venueId = venue?.id;
   const accent = venue?.primary_color || C.green;

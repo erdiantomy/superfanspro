@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
@@ -16,6 +16,11 @@ export default function RankPage() {
   const { user } = useAuth();
   const [tab, setTab] = useState<"monthly" | "lifetime">("monthly");
   useArenaRealtime();
+
+  useEffect(() => {
+    document.title = "Rankings | SuperFans";
+    return () => { document.title = "SuperFans — Play. Compete. Get Supported."; };
+  }, []);
 
   const { data: monthly  = [], isLoading: mLoad } = useMonthlyLeaderboard();
   const { data: lifetime = [], isLoading: lLoad } = useLifetimeLeaderboard();
