@@ -338,7 +338,14 @@ import React from "react";
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  // Redirect authenticated users to the main app
+  React.useEffect(() => {
+    if (!loading && user) {
+      navigate("/fanprize", { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   const { data: venues = [] } = useQuery({
     queryKey: ["active-venues"],
