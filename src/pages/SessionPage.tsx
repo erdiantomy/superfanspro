@@ -23,6 +23,11 @@ export default function SessionPage() {
 
   useSessionRealtime(session?.id);
 
+  useEffect(() => {
+    document.title = session?.name ? `${session.name} | SuperFans` : "SuperFans";
+    return () => { document.title = "SuperFans — Play. Compete. Get Supported."; };
+  }, [session?.name]);
+
   const requestJoin      = useRequestJoin();
   const updateStatus     = useUpdatePlayerStatus();
   const placeSupport     = usePlaceSupport();
