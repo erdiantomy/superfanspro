@@ -5,6 +5,7 @@ import { useSession, useSessionPlayers, usePadelPlayer, useSessionSupports, useP
 import { useSessionRealtime } from "@/hooks/useRealtime";
 import { getDivision, cr, resolveSupports } from "@/lib/gamification";
 import { Av, Tag, StatusTag, CountdownBadge, Divider, Row, C, fmtLabel, shareUrl, fmtTs } from "@/components/arena";
+import PlayerLink from "@/components/arena/PlayerLink";
 import { toast } from "sonner";
 import logo from "@/assets/superfans-logo.png";
 
@@ -239,7 +240,7 @@ export default function SessionPage() {
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                       <Av initials={sp.player.avatar} size={44} color={getDivision(sp.player.lifetime_xp).color} />
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 14, fontWeight: 700 }}>{sp.player.name}</div>
+                        <div style={{ fontSize: 14, fontWeight: 700 }}><PlayerLink player={sp.player} size={44} showAvatar={false} /></div>
                         <div style={{ fontSize: 11, color: C.muted }}>{sp.player.email}</div>
                         {sp.created_at && <div style={{ fontSize: 10, color: C.dim, marginTop: 2 }}>Requested {fmtTs(sp.created_at)}</div>}
                       </div>
@@ -259,7 +260,7 @@ export default function SessionPage() {
                 <span style={{ width: 18, fontSize: 10, color: C.dim, textAlign: "center" }}>{i + 1}</span>
                 <Av initials={sp.player.avatar} size={34} color={getDivision(sp.player.lifetime_xp).color} />
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700 }}>{sp.player.name}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700 }}><PlayerLink player={sp.player} size={34} showAvatar={false} /></div>
                   <div style={{ fontSize: 10, color: C.muted }}>{sp.player.email}</div>
                 </div>
                 {sp.role === "host" && <Tag label="HOST" color={C.orange} />}
@@ -313,7 +314,7 @@ export default function SessionPage() {
                   <span style={{ width: 22, textAlign: "center", fontSize: i < 3 ? 15 : 11, fontWeight: 700, color: i < 3 ? C.green : C.dim }}>{["👑","🥈","🥉"][i] || i + 1}</span>
                   <Av initials={sp.player.avatar} size={34} color={div.color} />
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600 }}>{sp.player.name}</div>
+                    <div style={{ fontSize: 13, fontWeight: 600 }}><PlayerLink player={sp.player} size={34} showAvatar={false} /></div>
                     <Tag label={div.label} color={div.color} />
                   </div>
                   <div style={{ textAlign: "right" }}>
@@ -362,7 +363,7 @@ export default function SessionPage() {
                     <div key={sp.id} onClick={() => setSupPicked(sp.player_id)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 12, marginBottom: 6, background: sel ? `${div.color}12` : C.raised, border: `2px solid ${sel ? div.color : C.border}`, cursor: "pointer", transition: "all .15s" }}>
                       <Av initials={sp.player.avatar} size={36} color={div.color} />
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 13, fontWeight: 700 }}>{sp.player.name}</div>
+                        <div style={{ fontSize: 13, fontWeight: 700 }}><PlayerLink player={sp.player} size={36} showAvatar={false} /></div>
                         <Tag label={div.label} color={div.color} />
                       </div>
                       <div style={{ textAlign: "right" }}>

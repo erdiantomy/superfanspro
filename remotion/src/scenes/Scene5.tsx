@@ -102,7 +102,7 @@ export const Scene5CTA: React.FC = () => {
           transform: `translateY(${urlY}px)`,
         }}
       >
-        superfanspro.lovable.app
+        superfans.games
       </div>
     </AbsoluteFill>
   );

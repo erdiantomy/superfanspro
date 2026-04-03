@@ -8,6 +8,7 @@ import { useVenue } from "@/hooks/useVenue";
 import { useArenaRealtime } from "@/hooks/useRealtime";
 import { getDivision } from "@/lib/gamification";
 import { Av, Tag, StatusTag, CountdownBadge, Divider, XpBar, C, fmtLabel } from "@/components/arena";
+import PlayerLink from "@/components/arena/PlayerLink";
 import CreditsDisplay from "@/components/wallet/CreditsDisplay";
 import ClaimProfileBanner from "@/components/profile/ClaimProfileBanner";
 import type { PadelPlayer, Session } from "@/hooks/useArena";
@@ -244,9 +245,8 @@ export default function VenuePage() {
             return (
               <motion.div key={p.id} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 14, marginBottom: 6, background: C.card, border: `1px solid ${C.border}` }}>
                 <span style={{ width: 22, textAlign: "center", fontSize: i < 3 ? 15 : 11, fontWeight: 700, color: i < 3 ? accent : C.dim }}>{["👑", "🥈", "🥉"][i] || i + 1}</span>
-                <Av initials={p.avatar} size={32} color={div.color} />
+                <PlayerLink player={p} size={32} />
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600 }}>{p.name}</div>
                   <div style={{ display: "flex", gap: 5, marginTop: 2 }}>
                     <Tag label={div.label} color={div.color} />
                     {p.streak >= 3 && <Tag label={`🔥${p.streak}`} color={C.orange} />}

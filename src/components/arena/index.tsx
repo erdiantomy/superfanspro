@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────
 // ARENA UI ATOMS
 // Shared primitives used across all arena pages
-// Design tokens match existing SuperFansPro system
+// Design tokens match existing SuperFans system
 // ─────────────────────────────────────────────────────
 import React, { useState, useEffect } from "react";
 import { getDivision, getDivisionKey } from "@/lib/gamification";

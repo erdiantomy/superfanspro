@@ -8,7 +8,7 @@
 //
 // ENVIRONMENT VARIABLES (set in Supabase Dashboard → Edge Functions → Secrets):
 //   RESEND_API_KEY   — your Resend API key
-//   SENDER_EMAIL     — verified sender email (e.g., noreply@superfanspro.com)
+//   SENDER_EMAIL     — verified sender email (e.g., noreply@superfans.games)
 //
 // DATABASE WEBHOOK SETUP (Supabase Dashboard → Database → Webhooks):
 //   Table: public.notifications
@@ -18,7 +18,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") || "";
-const SENDER_EMAIL = Deno.env.get("SENDER_EMAIL") || "noreply@superfanspro.com";
+const SENDER_EMAIL = Deno.env.get("SENDER_EMAIL") || "noreply@superfans.games";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 
@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: `SuperFansPro <${SENDER_EMAIL}>`,
+        from: `SuperFans <${SENDER_EMAIL}>`,
         to: [email],
         subject: notification.title,
         html: `
@@ -92,7 +92,7 @@ Deno.serve(async (req) => {
               <p style="margin: 0; font-size: 14px; color: #6D7A94; line-height: 1.5;">${notification.body}</p>
             </div>
             <div style="text-align: center; margin-top: 24px;">
-              <a href="https://superfanspro.com" style="display: inline-block; padding: 12px 32px; background: #00E676; color: #0B0E14; font-weight: 700; border-radius: 8px; text-decoration: none; font-size: 14px;">
+              <a href="https://superfans.games" style="display: inline-block; padding: 12px 32px; background: #00E676; color: #0B0E14; font-weight: 700; border-radius: 8px; text-decoration: none; font-size: 14px;">
                 Open SuperFans
               </a>
             </div>
