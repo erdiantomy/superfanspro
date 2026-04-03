@@ -8,7 +8,7 @@
 //
 // ENVIRONMENT VARIABLES (set in Supabase Dashboard → Edge Functions → Secrets):
 //   RESEND_API_KEY   — your Resend API key
-//   SENDER_EMAIL     — verified sender email (e.g., noreply@superfanspro.com)
+//   SENDER_EMAIL     — verified sender email (e.g., noreply@superfans.games)
 //
 // DATABASE WEBHOOK SETUP (Supabase Dashboard → Database → Webhooks):
 //   Table: public.notifications
