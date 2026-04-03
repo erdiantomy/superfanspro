@@ -19,6 +19,8 @@ import TopUpPage          from "@/pages/TopUpPage";
 import PaymentSuccessPage from "@/pages/PaymentSuccessPage";
 import PaymentFailedPage  from "@/pages/PaymentFailedPage";
 import NotFound           from "@/pages/NotFound";
+import PlayerDashboard    from "@/pages/PlayerDashboard";
+import SlugResolver       from "@/components/profile/SlugResolver";
 
 import "./App.css";
 
