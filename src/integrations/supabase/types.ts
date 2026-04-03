@@ -77,6 +77,67 @@ export type Database = {
         }
         Relationships: []
       }
+      donations: {
+        Row: {
+          amount: number
+          created_at: string
+          donor_id: string | null
+          donor_name: string
+          id: string
+          is_anonymous: boolean
+          message: string | null
+          payment_order_id: string | null
+          player_id: string
+          status: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          donor_id?: string | null
+          donor_name?: string
+          id?: string
+          is_anonymous?: boolean
+          message?: string | null
+          payment_order_id?: string | null
+          player_id: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          donor_id?: string | null
+          donor_name?: string
+          id?: string
+          is_anonymous?: boolean
+          message?: string | null
+          payment_order_id?: string | null
+          player_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donations_payment_order_id_fkey"
+            columns: ["payment_order_id"]
+            isOneToOne: false
+            referencedRelation: "payment_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "donations_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "padel_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "donations_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_stats"
+            referencedColumns: ["player_id"]
+          },
+        ]
+      }
       matches: {
         Row: {
           created_at: string
@@ -253,6 +314,60 @@ export type Database = {
           },
         ]
       }
+      player_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          display_name: string
+          id: string
+          is_public: boolean
+          player_id: string
+          slug: string
+          social_links: Json
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          is_public?: boolean
+          player_id: string
+          slug: string
+          social_links?: Json
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          is_public?: boolean
+          player_id?: string
+          slug?: string
+          social_links?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_profiles_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: true
+            referencedRelation: "padel_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_profiles_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: true
+            referencedRelation: "player_stats"
+            referencedColumns: ["player_id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -359,6 +474,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "score_submissions_reported_by_fkey"
+            columns: ["reported_by"]
+            isOneToOne: false
+            referencedRelation: "player_stats"
+            referencedColumns: ["player_id"]
+          },
+          {
             foreignKeyName: "score_submissions_session_id_fkey"
             columns: ["session_id"]
             isOneToOne: false
@@ -402,6 +524,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "padel_players"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_players_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_stats"
+            referencedColumns: ["player_id"]
           },
           {
             foreignKeyName: "session_players_session_id_fkey"
@@ -452,6 +581,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "session_supports_backed_id_fkey"
+            columns: ["backed_id"]
+            isOneToOne: false
+            referencedRelation: "player_stats"
+            referencedColumns: ["player_id"]
+          },
+          {
             foreignKeyName: "session_supports_session_id_fkey"
             columns: ["session_id"]
             isOneToOne: false
@@ -464,6 +600,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "padel_players"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_supports_supporter_id_fkey"
+            columns: ["supporter_id"]
+            isOneToOne: false
+            referencedRelation: "player_stats"
+            referencedColumns: ["player_id"]
           },
         ]
       }
@@ -537,6 +680,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "sessions_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "player_stats"
+            referencedColumns: ["player_id"]
+          },
+          {
             foreignKeyName: "sessions_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
@@ -544,6 +694,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      slugs: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          slug?: string
+        }
+        Relationships: []
       }
       supports: {
         Row: {
@@ -770,6 +944,30 @@ export type Database = {
       }
     }
     Views: {
+      donation_stats: {
+        Row: {
+          player_id: string | null
+          supporter_count: number | null
+          total_donations: number | null
+          total_raised: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donations_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "padel_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "donations_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_stats"
+            referencedColumns: ["player_id"]
+          },
+        ]
+      }
       leaderboard: {
         Row: {
           avatar_url: string | null
@@ -781,8 +979,91 @@ export type Database = {
         }
         Relationships: []
       }
+      player_profile_full: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          display_name: string | null
+          division: string | null
+          games_played: number | null
+          is_public: boolean | null
+          lifetime_xp: number | null
+          losses: number | null
+          monthly_pts: number | null
+          player_id: string | null
+          profile_created_at: string | null
+          profile_id: string | null
+          slug: string | null
+          social_links: Json | null
+          streak: number | null
+          supporter_count: number | null
+          total_donations: number | null
+          total_raised: number | null
+          win_rate: number | null
+          wins: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_profiles_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: true
+            referencedRelation: "padel_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_profiles_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: true
+            referencedRelation: "player_stats"
+            referencedColumns: ["player_id"]
+          },
+        ]
+      }
+      player_stats: {
+        Row: {
+          avatar: string | null
+          division: string | null
+          games_played: number | null
+          lifetime_xp: number | null
+          losses: number | null
+          monthly_pts: number | null
+          name: string | null
+          player_id: string | null
+          streak: number | null
+          win_rate: number | null
+          wins: number | null
+        }
+        Insert: {
+          avatar?: string | null
+          division?: string | null
+          games_played?: number | null
+          lifetime_xp?: number | null
+          losses?: never
+          monthly_pts?: number | null
+          name?: string | null
+          player_id?: string | null
+          streak?: number | null
+          win_rate?: never
+          wins?: number | null
+        }
+        Update: {
+          avatar?: string | null
+          division?: string | null
+          games_played?: number | null
+          lifetime_xp?: number | null
+          losses?: never
+          monthly_pts?: number | null
+          name?: string | null
+          player_id?: string | null
+          streak?: number | null
+          win_rate?: never
+          wins?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      check_slug_available: { Args: { p_slug: string }; Returns: boolean }
       credit_xp_for_score: {
         Args: { submission_id: string }
         Returns: undefined
@@ -794,6 +1075,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      resolve_slug: { Args: { p_slug: string }; Returns: Json }
       upsert_padel_player: {
         Args: {
           p_avatar: string
