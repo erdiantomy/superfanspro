@@ -5,6 +5,7 @@ import { useSession, useSessionPlayers, usePadelPlayer, useSessionSupports, useP
 import { useSessionRealtime } from "@/hooks/useRealtime";
 import { getDivision, cr, resolveSupports } from "@/lib/gamification";
 import { Av, Tag, StatusTag, CountdownBadge, Divider, Row, C, fmtLabel, shareUrl, fmtTs } from "@/components/arena";
+import PlayerLink from "@/components/arena/PlayerLink";
 import { toast } from "sonner";
 import logo from "@/assets/superfans-logo.png";
 
