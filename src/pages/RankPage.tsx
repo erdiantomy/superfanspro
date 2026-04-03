@@ -292,7 +292,7 @@ export default function RankPage() {
           { icon: "🏠", label: "Home",    action: () => navigate("/")      },
           { icon: "🏆", label: "Rankings",action: () => {},                  active: true },
           { icon: "🎾", label: "Sessions",action: () => navigate("/")      },
-          ...(user ? [{ icon: "👤", label: userProfile ? "My Page" : "Claim Page", action: () => userProfile ? navigate(`/${userProfile}`) : setShowClaim(true) }] : []),
+          ...(user ? [{ icon: "👤", label: userProfile ? "My Page" : "Profile", action: () => userProfile ? navigate(`/${userProfile}`) : navigate("/auth") }] : []),
         ].map((t, i) => (
           <button key={i} onClick={t.action as any} style={{
             flex: 1, display: "flex", flexDirection: "column",
