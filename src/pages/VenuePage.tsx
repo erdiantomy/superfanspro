@@ -248,7 +248,6 @@ export default function VenuePage() {
                 <PlayerLink player={p} size={32} />
                 <div style={{ flex: 1 }}>
                   <div style={{ display: "flex", gap: 5, marginTop: 2 }}>
-                  <div style={{ display: "flex", gap: 5, marginTop: 2 }}>
                     <Tag label={div.label} color={div.color} />
                     {p.streak >= 3 && <Tag label={`🔥${p.streak}`} color={C.orange} />}
                   </div>
