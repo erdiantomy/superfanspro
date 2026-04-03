@@ -9,7 +9,7 @@ import { useArenaRealtime } from "@/hooks/useRealtime";
 import { getDivision } from "@/lib/gamification";
 import { Tag, C } from "@/components/arena";
 import PlayerLink from "@/components/arena/PlayerLink";
-import ClaimProfileModal from "@/components/profile/ClaimProfileModal";
+import ClaimProfileBanner from "@/components/profile/ClaimProfileBanner";
 
 export default function RankPage() {
   const navigate = useNavigate();
