@@ -314,7 +314,7 @@ export default function SessionPage() {
                   <span style={{ width: 22, textAlign: "center", fontSize: i < 3 ? 15 : 11, fontWeight: 700, color: i < 3 ? C.green : C.dim }}>{["👑","🥈","🥉"][i] || i + 1}</span>
                   <Av initials={sp.player.avatar} size={34} color={div.color} />
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600 }}>{sp.player.name}</div>
+                    <div style={{ fontSize: 13, fontWeight: 600 }}><PlayerLink player={sp.player} size={34} showAvatar={false} /></div>
                     <Tag label={div.label} color={div.color} />
                   </div>
                   <div style={{ textAlign: "right" }}>
