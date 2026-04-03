@@ -183,7 +183,7 @@ function RegistrationCard({ r, onApprove, onReject, onDelete }: { r: Registratio
 }
 
 /* ── Main Dashboard ─────────────────────────────────── */
-type TabKey = "overview" | "registrations" | "venues" | "matches" | "users" | "revenue" | "notifications";
+type TabKey = "overview" | "registrations" | "venues" | "matches" | "users" | "revenue" | "notifications" | "players";
 
 function Dashboard() {
   const navigate = useNavigate();
