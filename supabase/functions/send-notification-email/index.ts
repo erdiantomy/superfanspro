@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: `SuperFansPro <${SENDER_EMAIL}>`,
+        from: `SuperFans <${SENDER_EMAIL}>`,
         to: [email],
         subject: notification.title,
         html: `
